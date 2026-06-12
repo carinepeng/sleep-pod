@@ -6,51 +6,26 @@
 <title>午休舱预订</title>
 <style>
   :root {
-    --navy: #0F2340;
-    --blue: #1A4D8F;
-    --sky: #3B82C4;
-    --mist: #EDF4FB;
-    --teal: #0D7A6B;
-    --teal-light: #E0F5F1;
-    --amber: #B85C0A;
-    --amber-light: #FDF0E6;
-    --sand: #F7F5F2;
-    --white: #FFFFFF;
-    --gray1: #1C1C1E;
-    --gray2: #48484A;
-    --gray3: #8E8E93;
-    --gray4: #C7C7CC;
-    --gray5: #F2F2F7;
-    --border: #E5E5EA;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --shadow: 0 2px 12px rgba(15,35,64,0.08);
-    --shadow-md: 0 4px 24px rgba(15,35,64,0.12);
+    --navy: #0F2340; --blue: #1A4D8F; --sky: #3B82C4; --mist: #EDF4FB;
+    --teal: #0D7A6B; --teal-light: #E0F5F1; --amber: #B85C0A; --amber-light: #FDF0E6;
+    --sand: #F7F5F2; --white: #FFFFFF;
+    --gray1: #1C1C1E; --gray2: #48484A; --gray3: #8E8E93; --gray4: #C7C7CC; --gray5: #F2F2F7;
+    --border: #E5E5EA; --radius: 12px; --radius-sm: 8px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif; background: var(--sand); color: var(--gray1); min-height: 100vh; }
-
-  /* Header */
   .header { background: var(--navy); padding: 0 20px; position: sticky; top: 0; z-index: 100; }
   .header-inner { max-width: 480px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
-  .header h1 { color: white; font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .header h1 { color: white; font-size: 17px; font-weight: 600; }
   .header-sub { color: rgba(255,255,255,0.5); font-size: 12px; }
-
-  /* Progress */
   .progress-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 20px; }
   .progress-inner { max-width: 480px; margin: 0 auto; display: flex; }
   .prog-step { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; color: var(--gray4); border-bottom: 2px solid transparent; transition: all 0.2s; }
   .prog-step.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 500; }
   .prog-step.done { color: var(--teal); border-bottom-color: var(--teal); }
-
-  /* Content */
   .content { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
-
-  /* Section */
   .section-title { font-size: 13px; font-weight: 500; color: var(--gray3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; margin-top: 24px; }
   .section-title:first-child { margin-top: 0; }
-
-  /* Cards */
   .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .card-option { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: all 0.15s; }
   .card-option:hover { border-color: var(--sky); }
@@ -63,7 +38,6 @@
   .card-badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 20px; margin-top: 6px; font-weight: 500; }
   .card-badge.discount { background: var(--amber-light); color: var(--amber); }
   .card-badge.instant { background: var(--teal-light); color: var(--teal); }
-
   /* Pod grid */
   .pods-legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--gray3); }
@@ -71,42 +45,46 @@
   .pods-grid { display: grid; gap: 6px; }
   .pods-grid.female { grid-template-columns: repeat(8, 1fr); }
   .pods-grid.male { grid-template-columns: repeat(8, 1fr); }
-  .pod-cell { aspect-ratio: 1; border: 1.5px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: var(--white); transition: all 0.15s; font-size: 11px; font-weight: 500; color: var(--gray2); }
+  .pod-cell { aspect-ratio: 1; border: 1.5px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: var(--white); transition: all 0.15s; }
   .pod-cell.weekly-type { border-style: dashed; border-color: var(--sky); }
   .pod-cell:hover:not(.occupied):not(.locked) { border-color: var(--blue); background: var(--mist); }
   .pod-cell.selected { border-color: var(--blue); border-style: solid; background: var(--blue); color: white; }
   .pod-cell.occupied { background: var(--gray5); color: var(--gray4); cursor: not-allowed; border-color: var(--border); border-style: solid; }
-  .pod-cell.locked { background: var(--gray5); color: var(--gray4); cursor: not-allowed; opacity: 0.5; }
-  .pod-num { font-size: 11px; line-height: 1; }
-  .pod-type { font-size: 8px; opacity: 0.6; margin-top: 1px; }
-  .pod-cell.selected .pod-type { opacity: 0.7; }
-
-  /* Date picker */
-  .date-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .date-cell { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 4px; text-align: center; cursor: pointer; background: var(--white); transition: all 0.15s; }
-  .date-cell:hover:not(.disabled) { border-color: var(--sky); }
-  .date-cell.selected { border-color: var(--blue); background: var(--blue); color: white; }
-  .date-cell.disabled { opacity: 0.35; cursor: not-allowed; background: var(--gray5); }
-  .date-cell.today .date-num { color: var(--blue); font-weight: 700; }
-  .date-cell.selected .date-num, .date-cell.selected .date-dow { color: white; }
-  .date-dow { font-size: 10px; color: var(--gray3); margin-bottom: 3px; }
-  .date-num { font-size: 14px; font-weight: 500; color: var(--gray1); }
-  .date-cell.disabled .date-dow, .date-cell.disabled .date-num { color: var(--gray4); }
-
-  /* Time slots */
-  .time-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-  .time-cell { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; cursor: pointer; background: var(--white); font-size: 13px; font-weight: 500; transition: all 0.15s; }
-  .time-cell:hover { border-color: var(--sky); }
-  .time-cell.selected { border-color: var(--blue); background: var(--blue); color: white; }
-  .time-cell.occupied { background: var(--gray5); color: var(--gray4); cursor: not-allowed; }
-
+  .pod-cell.locked { background: var(--gray5); color: var(--gray4); cursor: not-allowed; opacity: 0.4; }
+  .pod-num { font-size: 12px; font-weight: 600; line-height: 1; }
+  /* Date picker - calendar style */
+  .calendar-wrap { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+  .calendar-header { background: var(--navy); color: white; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
+  .calendar-month { font-size: 15px; font-weight: 600; }
+  .calendar-nav { background: rgba(255,255,255,0.15); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .calendar-nav:hover { background: rgba(255,255,255,0.25); }
+  .calendar-dow { display: grid; grid-template-columns: repeat(7,1fr); background: var(--sand); }
+  .calendar-dow-cell { text-align: center; padding: 8px 0; font-size: 11px; color: var(--gray3); font-weight: 500; }
+  .calendar-dow-cell.weekend { color: var(--amber); }
+  .calendar-days { display: grid; grid-template-columns: repeat(7,1fr); padding: 8px; gap: 4px; }
+  .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 14px; font-weight: 400; cursor: pointer; transition: all 0.15s; color: var(--gray1); }
+  .cal-day:hover:not(.cal-disabled):not(.cal-empty) { background: var(--mist); color: var(--blue); }
+  .cal-day.cal-today { font-weight: 700; color: var(--blue); }
+  .cal-day.cal-selected { background: var(--blue); color: white; font-weight: 600; }
+  .cal-day.cal-selected.cal-today { background: var(--blue); }
+  .cal-day.cal-disabled { color: var(--gray4); cursor: not-allowed; background: none; }
+  .cal-day.cal-empty { cursor: default; }
+  .cal-day.cal-weekend { color: var(--amber); }
+  .cal-day.cal-weekend.cal-selected { color: white; }
+  .cal-day.cal-past { color: var(--gray4); cursor: not-allowed; }
+  /* Time slot - single big button */
+  .time-big-btn { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; cursor: pointer; transition: all 0.15s; }
+  .time-big-btn:hover { border-color: var(--sky); background: var(--mist); }
+  .time-big-btn.selected { border-color: var(--blue); background: var(--blue); color: white; }
+  .time-big-btn.occupied { background: var(--gray5); color: var(--gray4); cursor: not-allowed; }
+  .time-big-label { font-size: 20px; font-weight: 700; }
+  .time-big-sub { font-size: 12px; margin-top: 4px; opacity: 0.7; }
   /* Form */
   .form-group { margin-bottom: 14px; }
   .form-label { font-size: 13px; color: var(--gray3); margin-bottom: 6px; display: block; }
   .form-input { width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; font-size: 15px; color: var(--gray1); background: var(--white); outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
   .form-input:focus { border-color: var(--blue); }
   select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
-
   /* Summary */
   .summary-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin: 16px 0; }
   .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; }
@@ -115,16 +93,15 @@
   .summary-value { color: var(--gray1); font-weight: 500; text-align: right; }
   .summary-total .summary-label { color: var(--gray1); font-weight: 600; font-size: 15px; }
   .summary-total .summary-value { color: var(--blue); font-size: 18px; font-weight: 700; }
-
-  /* QR pay */
+  /* Pay */
   .pay-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; }
   .pay-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-  .pay-amount { font-size: 28px; font-weight: 700; color: var(--blue); margin: 8px 0 16px; }
-  .qr-placeholder { width: 160px; height: 160px; background: var(--gray5); border-radius: var(--radius-sm); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--gray3); border: 1px dashed var(--gray4); }
+  .pay-amount { font-size: 32px; font-weight: 700; color: var(--blue); margin: 8px 0 4px; }
+  .pay-amount-sub { font-size: 12px; color: var(--gray3); margin-bottom: 16px; }
+  .qr-placeholder { width: 160px; height: 160px; background: var(--gray5); border-radius: var(--radius-sm); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--gray3); border: 1px dashed var(--gray4); text-align: center; line-height: 1.5; }
   .pay-hint { font-size: 12px; color: var(--gray3); line-height: 1.6; margin-bottom: 16px; }
   .pay-methods { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
-  .pay-method-badge { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--gray3); background: var(--gray5); padding: 4px 10px; border-radius: 20px; }
-
+  .pay-method-badge { font-size: 12px; color: var(--gray3); background: var(--gray5); padding: 4px 10px; border-radius: 20px; }
   /* Upload */
   .upload-area { border: 2px dashed var(--border); border-radius: var(--radius); padding: 24px; text-align: center; cursor: pointer; transition: all 0.15s; background: var(--white); }
   .upload-area:hover { border-color: var(--sky); background: var(--mist); }
@@ -134,21 +111,17 @@
   .upload-text strong { color: var(--gray1); }
   #fileInput { display: none; }
   .upload-preview { max-width: 100%; max-height: 200px; border-radius: var(--radius-sm); margin-top: 12px; }
-
-  /* Bottom bar */
+  /* Bottom */
   .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--border); padding: 12px 16px; z-index: 100; }
   .bottom-inner { max-width: 480px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
   .btn-back { background: var(--gray5); color: var(--gray2); border: none; border-radius: var(--radius-sm); padding: 13px 20px; font-size: 15px; font-weight: 500; cursor: pointer; flex-shrink: 0; }
-  .btn-next { flex: 1; background: var(--blue); color: white; border: none; border-radius: var(--radius-sm); padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.15s; letter-spacing: -0.3px; }
+  .btn-next { flex: 1; background: var(--blue); color: white; border: none; border-radius: var(--radius-sm); padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
   .btn-next:hover:not(:disabled) { background: var(--navy); }
   .btn-next:disabled { background: var(--gray4); cursor: not-allowed; }
-  .btn-next.success { background: var(--teal); }
-
   /* Notice */
   .notice { background: var(--amber-light); border-left: 3px solid var(--amber); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 10px 14px; font-size: 13px; color: var(--amber); line-height: 1.5; margin-bottom: 16px; }
   .notice-blue { background: var(--mist); border-left: 3px solid var(--blue); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 10px 14px; font-size: 13px; color: var(--blue); line-height: 1.5; margin-bottom: 16px; }
-
-  /* Success screen */
+  /* Success */
   .success-screen { text-align: center; padding: 40px 20px; }
   .success-icon { width: 72px; height: 72px; background: var(--teal-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px; }
   .success-title { font-size: 22px; font-weight: 700; color: var(--gray1); margin-bottom: 8px; }
@@ -163,13 +136,12 @@
   .ticket-amount { font-size: 20px; font-weight: 700; color: var(--teal); }
   .pending-notice { background: var(--amber-light); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; color: var(--amber); line-height: 1.6; max-width: 320px; margin: 0 auto 20px; text-align: left; }
   .btn-restart { background: var(--gray5); color: var(--gray2); border: none; border-radius: var(--radius-sm); padding: 12px 24px; font-size: 14px; font-weight: 500; cursor: pointer; }
-
-  /* Toast */
   .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: var(--gray1); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
-
-  /* Closed notice */
-  .closed-banner { background: var(--navy); color: white; text-align: center; padding: 16px; font-size: 14px; line-height: 1.6; }
+  .weekly-dates-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; }
+  .weekly-dates-title { font-size: 13px; color: var(--gray3); margin-bottom: 8px; }
+  .weekly-dates-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .weekly-date-tag { background: var(--mist); color: var(--blue); font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -204,47 +176,55 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ============ CONFIG ============
 const SUPABASE_URL = 'https://fbnofibcfpdcrhuaqvgh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_jmaLdj9S1t06j-1F_dhl8Q_36cO36xc';
-// 收款码图片URL - 部署后替换为真实图片地址
 const QR_CODE_URL = 'YOUR_QR_CODE_IMAGE_URL';
 
-const DEPARTMENTS = ['战略事业部','产品技术部','市场营销部','销售运营部','客户成功部','人力资源部','财务管理部','法务合规部','品牌设计部','供应链部','数据智能部','运营中心','行政后勤部','内容创作部','商务拓展部'];
-const TIME_SLOTS = ['12:30–13:00','13:00–13:30','13:30–14:00'];
+// ✅ 真实事业群名称
+const DEPARTMENTS = [
+  '总经办',
+  '三七游戏-研发事业群',
+  '37手游',
+  '37网游事业群',
+  '37GAMES-海外发行事业群',
+  '财管与风控事业群',
+  '技术中心',
+  '人力资源行政中心',
+  '战略管理中心',
+  '设计中心',
+  '产品合作中心',
+  '轻悠部落',
+  '神鞠工作室',
+  '火凤凰',
+  '妙小程'
+];
 
-// ============ STATE ============
+// ✅ 只有一个完整时段
+const TIME_SLOT = '12:30–14:00';
+
 let state = {
-  step: 1,
-  gender: null,
-  cardType: null,
-  pod: null,
-  date: null,
-  timeSlot: null,
+  step: 1, gender: null, cardType: null, pod: null,
+  date: null, weekDates: [],   // weekDates: 周卡对应的周一~周五日期
   name: '', dept: '', empId: '',
-  screenshot: null, screenshotBase64: null,
-  allPods: [], blockedDates: [], takenSlots: []
+  screenshot: null,
+  allPods: [], blockedDates: [], takenSlots: [],
+  calYear: new Date().getFullYear(), calMonth: new Date().getMonth()
 };
 
-// ============ SUPABASE HELPERS ============
+// ============ SUPABASE ============
 async function sbFetch(path, opts = {}) {
   const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
     headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': opts.prefer || 'return=representation',
+      'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json', 'Prefer': opts.prefer || 'return=representation',
       ...opts.headers
-    },
-    ...opts
+    }, ...opts
   });
   if (!res.ok) { const e = await res.text(); throw new Error(e); }
   return res.json().catch(() => null);
 }
 
-async function loadPods() {
-  return sbFetch('pods?select=*&is_active=eq.true&order=pod_number.asc');
-}
+async function loadPods() { return sbFetch('pods?select=*&is_active=eq.true&order=pod_number.asc'); }
 async function loadBlockedDates() {
   const from = new Date().toISOString().slice(0,10);
   return sbFetch(`blocked_dates?date=gte.${from}&select=date`);
@@ -253,175 +233,244 @@ async function loadTakenSlots(podId, date) {
   return sbFetch(`bookings?pod_id=eq.${podId}&booking_date=eq.${date}&status=in.(pending,confirmed)&select=time_slot`);
 }
 async function createBooking(data) {
-  return sbFetch('bookings', {
-    method: 'POST',
-    prefer: 'return=representation',
-    body: JSON.stringify(data)
-  });
+  return sbFetch('bookings', { method: 'POST', prefer: 'return=representation', body: JSON.stringify(data) });
 }
 
 // ============ TIME RULES ============
 function isBookingOpen(cardType) {
   const now = new Date();
   const h = now.getHours(), m = now.getMinutes();
-  const nowMins = h * 60 + m;
-  const open9 = 9 * 60, close14 = 14 * 60;
-  if (cardType === 'daily') {
-    return nowMins >= open9 && nowMins < close14;
-  }
+  const mins = h * 60 + m;
+  if (cardType === 'daily') return mins >= 9*60 && mins < 14*60;
   if (cardType === 'weekly') {
     const dow = now.getDay(); // 0=Sun,1=Mon...4=Thu
-    const thu9Open = dow === 4 && nowMins >= open9;
-    const fri = dow === 5;
-    const sat = dow === 6;
-    const sun = dow === 0;
-    const monBeforeClose = dow === 1 && nowMins < close14;
-    return thu9Open || fri || sat || sun || monBeforeClose;
+    const thu9 = dow === 4 && mins >= 9*60;
+    const fri = dow === 5, sat = dow === 6, sun = dow === 0;
+    const monBefore14 = dow === 1 && mins < 14*60;
+    return thu9 || fri || sat || sun || monBefore14;
   }
   return false;
 }
 
-function getAvailableDates(cardType) {
-  const dates = [];
+// ✅ 周卡：返回当前可预订周次的周一~周五日期
+function getWeeklyDates() {
   const now = new Date();
-  const blocked = state.blockedDates.map(d => d.date);
-  for (let i = 0; i < 14; i++) {
-    const d = new Date(now); d.setDate(now.getDate() + i);
-    const dow = d.getDay();
-    const ds = d.toISOString().slice(0,10);
-    if (blocked.includes(ds)) continue;
-    if (cardType === 'weekly' && (dow === 0 || dow === 6)) continue;
-    if (cardType === 'daily' && i === 0) {
-      const h = now.getHours(), m = now.getMinutes();
-      if (h * 60 + m >= 14 * 60) continue;
-    }
-    dates.push({ date: ds, dow, isToday: i === 0 });
-    if (dates.length >= 7) break;
+  const dow = now.getDay(); // 0=Sun
+  // 找到"下一个周一"（如果今天是周四~周一，是本周或下周）
+  let monday = new Date(now);
+  // 从周四开始预订下周一~周五
+  // 规则：上周四9:00 ~ 本周一14:00 预订本周
+  // 所以我们找"当前应该预订哪周"
+  if (dow === 4 || dow === 5 || dow === 6 || dow === 0) {
+    // 周四~周日：预订下周
+    const daysToMonday = (8 - dow) % 7 || 7;
+    monday.setDate(now.getDate() + daysToMonday);
+  } else if (dow === 1) {
+    // 周一：预订本周
+    monday.setDate(now.getDate());
+  } else {
+    // 周二周三：理论上不开放，但以防万一预订下周
+    const daysToMonday = (8 - dow) % 7;
+    monday.setDate(now.getDate() + daysToMonday);
+  }
+  const dates = [];
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    dates.push(d.toISOString().slice(0, 10));
   }
   return dates;
 }
 
-// ============ SAVED USER INFO ============
-function loadSavedInfo() {
-  try {
-    const s = JSON.parse(localStorage.getItem('sleepPodUser') || '{}');
-    return s;
-  } catch(e) { return {}; }
-}
-function saveUserInfo(name, dept, empId) {
-  localStorage.setItem('sleepPodUser', JSON.stringify({name, dept, empId}));
+// ============ CALENDAR ============
+function renderCalendar() {
+  const blocked = new Set(state.blockedDates.map(d => d.date));
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().slice(0,10);
+  const y = state.calYear, m = state.calMonth;
+  const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const firstDay = new Date(y, m, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const startOffset = firstDay === 0 ? 6 : firstDay - 1; // Mon-based offset
+
+  let days = '';
+  for (let i = 0; i < startOffset; i++) days += `<div class="cal-day cal-empty"></div>`;
+
+  const nowMins = new Date().getHours()*60 + new Date().getMinutes();
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dateObj = new Date(y, m, d);
+    const dow = dateObj.getDay(); // 0=Sun,6=Sat
+    const isPast = dateObj < today;
+    const isToday = dateStr === todayStr;
+    const isBlocked = blocked.has(dateStr);
+    const isWeekend = dow === 0 || dow === 6;
+
+    let disabled = isPast || isBlocked;
+    if (state.cardType === 'daily') {
+      if (isWeekend) disabled = true;
+      if (isToday && nowMins >= 14*60) disabled = true; // past 14:00 today
+      if (!isToday && !isPast && isWeekend) disabled = true;
+    }
+    if (state.cardType === 'weekly') {
+      // For weekly, date selection is auto - handled by getWeeklyDates()
+      disabled = true; // calendar not used for weekly
+    }
+
+    const cls = [
+      'cal-day',
+      isPast ? 'cal-past' : '',
+      isToday ? 'cal-today' : '',
+      isWeekend ? 'cal-weekend' : '',
+      disabled ? 'cal-disabled' : '',
+      state.date === dateStr ? 'cal-selected' : ''
+    ].filter(Boolean).join(' ');
+
+    days += `<div class="${cls}" ${!disabled ? `onclick="selDate('${dateStr}')"` : ''}>${d}</div>`;
+  }
+
+  return `
+  <div class="calendar-wrap">
+    <div class="calendar-header">
+      <button class="calendar-nav" onclick="changeMonth(-1)">‹</button>
+      <span class="calendar-month">${y}年 ${monthNames[m]}</span>
+      <button class="calendar-nav" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="calendar-dow">
+      <div class="calendar-dow-cell">一</div><div class="calendar-dow-cell">二</div>
+      <div class="calendar-dow-cell">三</div><div class="calendar-dow-cell">四</div>
+      <div class="calendar-dow-cell">五</div>
+      <div class="calendar-dow-cell weekend">六</div><div class="calendar-dow-cell weekend">日</div>
+    </div>
+    <div class="calendar-days">${days}</div>
+  </div>`;
 }
 
-// ============ RENDER STEPS ============
+function changeMonth(delta) {
+  state.calMonth += delta;
+  if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
+  if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
+  document.getElementById('appContent').innerHTML = renderStep3();
+  bindStepEvents();
+}
+
+// ============ SAVED USER INFO ============
+function loadSavedInfo() { try { return JSON.parse(localStorage.getItem('sleepPodUser') || '{}'); } catch(e) { return {}; } }
+function saveUserInfo(name, dept, empId) { localStorage.setItem('sleepPodUser', JSON.stringify({name, dept, empId})); }
+
+// ============ RENDER ============
 function render() {
-  updateProgressBar();
-  updateBottomBar();
+  updateProgressBar(); updateBottomBar();
   const c = document.getElementById('appContent');
-  switch(state.step) {
-    case 1: c.innerHTML = renderStep1(); break;
-    case 2: c.innerHTML = renderStep2(); break;
-    case 3: c.innerHTML = renderStep3(); break;
-    case 4: c.innerHTML = renderStep4(); break;
-    case 5: c.innerHTML = renderStep5(); break;
-    case 6: c.innerHTML = renderStep6(); break;
-  }
+  if (state.step === 1) c.innerHTML = renderStep1();
+  else if (state.step === 2) c.innerHTML = renderStep2();
+  else if (state.step === 3) c.innerHTML = renderStep3();
+  else if (state.step === 4) c.innerHTML = renderStep4();
+  else if (state.step === 5) c.innerHTML = renderStep5();
+  else if (state.step === 6) c.innerHTML = renderStep6();
   bindStepEvents();
 }
 
 function renderStep1() {
+  const dailyOpen = isBookingOpen('daily'), weeklyOpen = isBookingOpen('weekly');
   return `
   <div class="section-title">选择区域</div>
   <div class="card-grid">
     <div class="card-option ${state.gender==='female'?'selected':''}" onclick="selGender('female')">
-      <div class="card-icon">🌸</div>
-      <div class="card-title">女舱</div>
+      <div class="card-icon">🌸</div><div class="card-title">女舱</div>
       <div class="card-desc">共 16 个床位<br>私密安静</div>
     </div>
     <div class="card-option ${state.gender==='male'?'selected':''}" onclick="selGender('male')">
-      <div class="card-icon">🔵</div>
-      <div class="card-title">男舱</div>
+      <div class="card-icon">🔵</div><div class="card-title">男舱</div>
       <div class="card-desc">共 46 个床位<br>宽敞舒适</div>
     </div>
   </div>
   <div class="section-title">选择卡类型</div>
   <div class="card-grid">
-    <div class="card-option ${state.cardType==='daily'?'selected':''} ${!isBookingOpen('daily')?'disabled':''}" onclick="${isBookingOpen('daily')?'selCardType(\'daily\')':''}">
-      <div class="card-icon">📅</div>
-      <div class="card-title">日卡</div>
-      <div class="card-desc">当天 9:00 起可订<br>过 14:00 自动关闭</div>
+    <div class="card-option ${state.cardType==='daily'?'selected':''} ${!dailyOpen?'disabled':''}" onclick="${dailyOpen?'selCardType(\'daily\')':''}">
+      <div class="card-icon">📅</div><div class="card-title">日卡</div>
+      <div class="card-desc">单次使用<br>当天 9:00 起可订，14:00 关闭</div>
       <div class="card-price">¥10<span style="font-size:12px;font-weight:400;color:var(--gray3)">/次</span></div>
-      ${isBookingOpen('daily') ? '<span class="card-badge instant">现在可订</span>' : '<span class="card-badge" style="background:var(--gray5);color:var(--gray3)">暂未开放</span>'}
+      ${dailyOpen ? '<span class="card-badge instant">现在可订</span>' : '<span class="card-badge" style="background:var(--gray5);color:var(--gray3)">暂未开放</span>'}
     </div>
-    <div class="card-option ${state.cardType==='weekly'?'selected':''} ${!isBookingOpen('weekly')?'disabled':''}" onclick="${isBookingOpen('weekly')?'selCardType(\'weekly\')':''}">
-      <div class="card-icon">📆</div>
-      <div class="card-title">周卡</div>
-      <div class="card-desc">周四 9:00 起可订<br>周一至周五可用</div>
-      <div class="card-price">¥8<span style="font-size:12px;font-weight:400;color:var(--gray3)">/次</span></div>
-      ${isBookingOpen('weekly') ? '<span class="card-badge discount">8折优惠</span>' : '<span class="card-badge" style="background:var(--gray5);color:var(--gray3)">暂未开放</span>'}
+    <div class="card-option ${state.cardType==='weekly'?'selected':''} ${!weeklyOpen?'disabled':''}" onclick="${weeklyOpen?'selCardType(\'weekly\')':''}">
+      <div class="card-icon">📆</div><div class="card-title">周卡</div>
+      <div class="card-desc">一次预订整周（周一~周五）<br>上周四9:00起可订</div>
+      <div class="card-price">¥40<span style="font-size:12px;font-weight:400;color:var(--gray3)">/周</span></div>
+      ${weeklyOpen ? '<span class="card-badge discount">8折 · 5天打包</span>' : '<span class="card-badge" style="background:var(--gray5);color:var(--gray3)">暂未开放</span>'}
     </div>
-  </div>
-  `;
+  </div>`;
 }
 
 function renderStep2() {
   const isFemale = state.gender === 'female';
   const total = isFemale ? 16 : 46;
   const weeklyStart = isFemale ? 9 : 24;
-  const pods = state.allPods.filter(p => p.gender === state.gender);
-  const occupiedIds = new Set(pods.filter(p => !p.is_active).map(p => p.pod_number));
-  // Simulate some occupied for demo — real data comes from bookings
-  const rows = [];
+  const occupied = new Set(state.allPods.filter(p => p.gender === state.gender && !p.is_active).map(p => p.pod_number));
+
+  let cells = '';
   for (let i = 1; i <= total; i++) {
     const isWeekly = i >= weeklyStart;
     const isMyType = (state.cardType === 'weekly') === isWeekly;
-    const isOccupied = occupiedIds.has(i);
-    const isLocked = !isMyType;
-    const isSelected = state.pod === i;
+    const isOcc = occupied.has(i);
+    const locked = !isMyType;
+    const sel = state.pod === i;
     let cls = 'pod-cell';
     if (isWeekly) cls += ' weekly-type';
-    if (isLocked) cls += ' locked';
-    else if (isOccupied) cls += ' occupied';
-    else if (isSelected) cls += ' selected';
-    const onclick = (!isLocked && !isOccupied) ? `selPod(${i})` : '';
-    rows.push(`<div class="${cls}" ${onclick?'onclick="'+onclick+'"':''}><span class="pod-num">${i}</span><span class="pod-type">${isWeekly?'周':'日'}</span></div>`);
+    if (locked) cls += ' locked';
+    else if (isOcc) cls += ' occupied';
+    else if (sel) cls += ' selected';
+    const click = (!locked && !isOcc) ? `onclick="selPod(${i})"` : '';
+    cells += `<div class="${cls}" ${click}><span class="pod-num">${i}</span></div>`;
   }
+
   return `
-  <div class="notice-blue">显示「${state.cardType==='weekly'?'周卡':'日卡'}」专属床位（虚线框=周卡，实线框=日卡）</div>
+  <div class="notice-blue">仅显示「${state.cardType==='weekly'?'周卡专属（虚线框）':'日卡（实线框）'}」床位，灰色为不可用</div>
   <div class="pods-legend">
-    <div class="legend-item"><div class="legend-dot" style="background:white;border:1.5px solid #E5E5EA"></div>可用</div>
+    <div class="legend-item"><div class="legend-dot" style="background:white;border:1.5px solid #E5E5EA"></div>可选</div>
     <div class="legend-item"><div class="legend-dot" style="background:white;border:1.5px dashed #3B82C4"></div>周卡专属</div>
     <div class="legend-item"><div class="legend-dot" style="background:#1A4D8F"></div>已选</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#F2F2F7"></div>已占/维修</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#F2F2F7"></div>不可用</div>
   </div>
-  <div class="pods-grid ${state.gender}">${rows.join('')}</div>
-  `;
+  <div class="pods-grid ${state.gender}">${cells}</div>`;
 }
 
 function renderStep3() {
-  const dates = getAvailableDates(state.cardType);
-  const dowNames = ['日','一','二','三','四','五','六'];
-  const dateCells = dates.map(({date, dow, isToday}) => {
-    const sel = state.date === date;
-    const parts = date.split('-');
-    return `<div class="date-cell ${sel?'selected':''} ${isToday?'today':''}" onclick="selDate('${date}')">
-      <div class="date-dow">周${dowNames[dow]}</div>
-      <div class="date-num">${parseInt(parts[2])}</div>
-    </div>`;
-  }).join('');
-
-  let timeHtml = '';
-  if (state.date) {
-    const taken = new Set(state.takenSlots.map(t => t.time_slot));
-    timeHtml = `<div class="section-title">选择时段</div>
-    <div class="time-grid">
-      ${TIME_SLOTS.map(t => `<div class="time-cell ${state.timeSlot===t?'selected':''} ${taken.has(t)?'occupied':''}" onclick="${taken.has(t)?'':'selTime(\''+t+'\')'}">${t}</div>`).join('')}
+  if (state.cardType === 'weekly') {
+    // 周卡：自动计算本周日期，不需要用户选择
+    const weekDates = getWeeklyDates();
+    state.weekDates = weekDates;
+    state.date = weekDates[0]; // 周一作为主日期
+    // 自动设为已选
+    setTimeout(() => { document.getElementById('btnNext').disabled = false; }, 50);
+    const dayNames = ['周一','周二','周三','周四','周五'];
+    return `
+    <div class="section-title">预订时间</div>
+    <div class="notice-blue">周卡一次预订整周，以下5天全部预订同一床位</div>
+    <div class="weekly-dates-box">
+      <div class="weekly-dates-title">预订日期</div>
+      <div class="weekly-dates-list">
+        ${weekDates.map((d,i) => `<span class="weekly-date-tag">${dayNames[i]} ${d.slice(5).replace('-','/')}</span>`).join('')}
+      </div>
+    </div>
+    <div class="section-title">时段</div>
+    <div class="time-big-btn selected">
+      <div class="time-big-label">12:30–14:00</div>
+      <div class="time-big-sub">每天午休时段，共5天</div>
     </div>`;
   }
+
+  // 日卡：日历选日期
   return `
   <div class="section-title">选择日期</div>
-  <div class="date-grid">${dateCells}</div>
-  ${timeHtml}
-  `;
+  ${renderCalendar()}
+  ${state.date ? `
+  <div class="section-title">时段</div>
+  <div class="time-big-btn selected" onclick="selTime()">
+    <div class="time-big-label">12:30–14:00</div>
+    <div class="time-big-sub">午休时段（共90分钟）</div>
+  </div>` : ''}`;
 }
 
 function renderStep4() {
@@ -429,6 +478,11 @@ function renderStep4() {
   const name = state.name || saved.name || '';
   const dept = state.dept || saved.dept || '';
   const empId = state.empId || saved.empId || '';
+  const amount = state.cardType === 'weekly' ? 40 : 10;
+  const dateDisplay = state.cardType === 'weekly'
+    ? `${state.weekDates[0]} 至 ${state.weekDates[4]}（5天）`
+    : state.date;
+
   return `
   ${(name||dept||empId) ? '<div class="notice-blue">已自动填入上次信息，如有变化请修改</div>' : ''}
   <div class="form-group">
@@ -448,47 +502,47 @@ function renderStep4() {
   </div>
   <div class="summary-box">
     <div class="summary-row"><span class="summary-label">区域</span><span class="summary-value">${state.gender==='female'?'女舱':'男舱'}</span></div>
-    <div class="summary-row"><span class="summary-label">床位</span><span class="summary-value">#${state.pod}</span></div>
-    <div class="summary-row"><span class="summary-label">日期</span><span class="summary-value">${state.date}</span></div>
-    <div class="summary-row"><span class="summary-label">时段</span><span class="summary-value">${state.timeSlot}</span></div>
-    <div class="summary-row summary-total"><span class="summary-label">应付金额</span><span class="summary-value">¥${state.cardType==='weekly'?8:10}</span></div>
-  </div>
-  `;
+    <div class="summary-row"><span class="summary-label">床位</span><span class="summary-value">床位 #${state.pod}</span></div>
+    <div class="summary-row"><span class="summary-label">日期</span><span class="summary-value">${dateDisplay}</span></div>
+    <div class="summary-row"><span class="summary-label">时段</span><span class="summary-value">12:30–14:00</span></div>
+    <div class="summary-row summary-total"><span class="summary-label">应付金额</span><span class="summary-value">¥${amount}</span></div>
+  </div>`;
 }
 
 function renderStep5() {
-  const amount = state.cardType === 'weekly' ? 8 : 10;
+  const amount = state.cardType === 'weekly' ? 40 : 10;
   const qrIsReal = QR_CODE_URL !== 'YOUR_QR_CODE_IMAGE_URL';
   return `
   <div class="pay-box">
     <div class="pay-title">扫码支付</div>
     <div class="pay-amount">¥${amount}</div>
+    <div class="pay-amount-sub">${state.cardType==='weekly'?'周卡 5天 × ¥8/次':'日卡 单次'}</div>
     ${qrIsReal
-      ? `<img src="${QR_CODE_URL}" style="width:160px;height:160px;border-radius:8px;margin:0 auto 12px;display:block;" />`
-      : `<div class="qr-placeholder">请联系管理员<br>上传收款码图片</div>`
-    }
+      ? `<img src="${QR_CODE_URL}" style="width:160px;height:160px;border-radius:8px;margin:0 auto 12px;display:block;">`
+      : `<div class="qr-placeholder">请联系管理员<br>上传收款码图片</div>`}
     <div class="pay-methods">
-      <div class="pay-method-badge">支付宝</div>
-      <div class="pay-method-badge">银联</div>
-      <div class="pay-method-badge">云闪付</div>
+      <span class="pay-method-badge">支付宝</span>
+      <span class="pay-method-badge">银联</span>
+      <span class="pay-method-badge">云闪付</span>
     </div>
-    <div class="pay-hint">付款时请备注：<strong>${state.name} ${state.empId}</strong><br>支付完成后，上传付款截图</div>
+    <div class="pay-hint">付款备注：<strong>${state.name || ''} ${state.empId || ''}</strong><br>支付完成后上传付款截图</div>
   </div>
   <div class="section-title" style="margin-top:20px">上传付款截图</div>
   <div class="upload-area ${state.screenshot?'has-file':''}" onclick="document.getElementById('fileInput').click()">
     <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)">
     ${state.screenshot
       ? `<div class="upload-icon">✅</div><div class="upload-text"><strong>截图已上传</strong><br>点击重新选择</div>
-         <img src="${state.screenshot}" class="upload-preview" />`
-      : `<div class="upload-icon">📸</div><div class="upload-text"><strong>点击上传截图</strong><br>支持 JPG、PNG</div>`
-    }
-  </div>
-  `;
+         <img src="${state.screenshot}" class="upload-preview">`
+      : `<div class="upload-icon">📸</div><div class="upload-text"><strong>点击上传截图</strong><br>支持 JPG、PNG</div>`}
+  </div>`;
 }
 
 function renderStep6() {
-  const amount = state.cardType === 'weekly' ? 8 : 10;
+  const amount = state.cardType === 'weekly' ? 40 : 10;
   const orderId = state.orderId || '—';
+  const dateDisplay = state.cardType === 'weekly'
+    ? `${state.weekDates[0]} ~ ${state.weekDates[4]}`
+    : state.date;
   return `
   <div class="success-screen">
     <div class="success-icon">🌙</div>
@@ -498,42 +552,33 @@ function renderStep6() {
       <div class="ticket-id">订单号 ${orderId}</div>
       <div class="ticket-row"><span>姓名</span><span>${state.name}</span></div>
       <div class="ticket-row"><span>工号</span><span>${state.empId}</span></div>
-      <div class="ticket-row"><span>区域</span><span>${state.gender==='female'?'女舱':'男舱'} #${state.pod}</span></div>
-      <div class="ticket-row"><span>日期</span><span>${state.date}</span></div>
-      <div class="ticket-row"><span>时段</span><span>${state.timeSlot}</span></div>
+      <div class="ticket-row"><span>区域 / 床位</span><span>${state.gender==='female'?'女舱':'男舱'} #${state.pod}</span></div>
+      <div class="ticket-row"><span>日期</span><span>${dateDisplay}</span></div>
+      <div class="ticket-row"><span>时段</span><span>12:30–14:00</span></div>
+      <div class="ticket-row"><span>类型</span><span>${state.cardType==='weekly'?'周卡（5天）':'日卡'}</span></div>
       <div class="ticket-row"><span>金额</span><span class="ticket-amount">¥${amount}</span></div>
     </div>
-    <div class="pending-notice">⏳ 待管理员确认收款后预约生效，通常在当天上午完成。不支持退订，请确认信息无误。</div>
+    <div class="pending-notice">⏳ 待管理员确认收款后预约生效，通常在当天上午完成。不支持退订。</div>
     <button class="btn-restart" onclick="restartBooking()">再预订一次</button>
-  </div>
-  `;
+  </div>`;
 }
 
 // ============ EVENTS ============
 function selGender(g) { state.gender = g; render(); checkStep1(); }
 function selCardType(ct) { state.cardType = ct; render(); checkStep1(); }
 function checkStep1() { document.getElementById('btnNext').disabled = !(state.gender && state.cardType); }
+function selPod(n) { state.pod = n; render(); document.getElementById('btnNext').disabled = false; }
 
-function selPod(n) {
-  state.pod = n;
+function selDate(d) {
+  state.date = d;
+  // For daily: time is fixed 12:30–14:00, auto-select
+  state.timeSlot = TIME_SLOT;
   render();
   document.getElementById('btnNext').disabled = false;
 }
 
-async function selDate(d) {
-  state.date = d; state.timeSlot = null;
-  state.takenSlots = [];
-  if (state.pod) {
-    const podObj = state.allPods.find(p => p.gender === state.gender && p.pod_number === state.pod);
-    if (podObj) state.takenSlots = await loadTakenSlots(podObj.id, d) || [];
-  }
-  render();
-  document.getElementById('btnNext').disabled = true;
-}
-
-function selTime(t) {
-  state.timeSlot = t;
-  render();
+function selTime() {
+  state.timeSlot = TIME_SLOT;
   document.getElementById('btnNext').disabled = false;
 }
 
@@ -541,8 +586,7 @@ function onFormChange() {
   state.name = document.getElementById('fName').value.trim();
   state.dept = document.getElementById('fDept').value;
   state.empId = document.getElementById('fEmpId').value.trim();
-  const ok = state.name && state.dept && state.empId;
-  document.getElementById('btnNext').disabled = !ok;
+  document.getElementById('btnNext').disabled = !(state.name && state.dept && state.empId);
 }
 
 function onFileSelect(e) {
@@ -550,7 +594,6 @@ function onFileSelect(e) {
   const reader = new FileReader();
   reader.onload = ev => {
     state.screenshot = ev.target.result;
-    state.screenshotFile = file;
     render();
     document.getElementById('btnNext').disabled = false;
   };
@@ -559,14 +602,19 @@ function onFileSelect(e) {
 
 function bindStepEvents() {
   if (state.step === 4) setTimeout(onFormChange, 50);
+  if (state.step === 3 && state.cardType === 'weekly') {
+    setTimeout(() => { document.getElementById('btnNext').disabled = false; }, 50);
+  }
+  if (state.step === 3 && state.cardType === 'daily' && state.date) {
+    setTimeout(() => { document.getElementById('btnNext').disabled = false; }, 50);
+  }
 }
 
 // ============ NAVIGATION ============
 function updateProgressBar() {
   for (let i = 1; i <= 6; i++) {
     const el = document.getElementById('ps' + i);
-    if (!el) continue;
-    el.className = 'prog-step' + (i === state.step ? ' active' : (i < state.step ? ' done' : ''));
+    if (el) el.className = 'prog-step' + (i === state.step ? ' active' : i < state.step ? ' done' : '');
   }
 }
 
@@ -584,19 +632,24 @@ function updateBottomBar() {
   }
 }
 
-function goBack() {
-  if (state.step > 1) { state.step--; render(); }
-}
+function goBack() { if (state.step > 1) { state.step--; render(); } }
 
 async function goNext() {
-  if (state.step === 1) { state.step = 2; await loadPodsData(); render(); document.getElementById('btnNext').disabled = !state.pod; }
-  else if (state.step === 2) { state.step = 3; render(); document.getElementById('btnNext').disabled = true; }
-  else if (state.step === 3) { state.step = 4; render(); }
-  else if (state.step === 4) {
+  if (state.step === 1) {
+    state.step = 2; await loadPodsData(); render();
+    document.getElementById('btnNext').disabled = !state.pod;
+  } else if (state.step === 2) {
+    state.step = 3; render();
+    document.getElementById('btnNext').disabled = true;
+  } else if (state.step === 3) {
+    state.step = 4; render();
+  } else if (state.step === 4) {
     saveUserInfo(state.name, state.dept, state.empId);
-    state.step = 5; render(); document.getElementById('btnNext').disabled = !state.screenshot;
+    state.step = 5; render();
+    document.getElementById('btnNext').disabled = !state.screenshot;
+  } else if (state.step === 5) {
+    await submitBooking();
   }
-  else if (state.step === 5) { await submitBooking(); }
 }
 
 async function loadPodsData() {
@@ -611,27 +664,24 @@ async function submitBooking() {
   btn.disabled = true; btn.textContent = '提交中...';
   try {
     const podObj = state.allPods.find(p => p.gender === state.gender && p.pod_number === state.pod);
-    const amount = state.cardType === 'weekly' ? 8 : 10;
-    // Upload screenshot to Supabase Storage (simplified: store as text reference)
+    const amount = state.cardType === 'weekly' ? 40 : 10;
     const booking = {
-      pod_id: podObj?.id,
-      gender: state.gender,
-      pod_number: state.pod,
+      pod_id: podObj?.id, gender: state.gender, pod_number: state.pod,
       card_type: state.cardType,
       booking_date: state.date,
-      time_slot: state.timeSlot,
-      name: state.name,
-      department: state.dept,
-      employee_id: state.empId,
-      status: 'pending',
-      is_free: false,
-      payment_amount: amount,
+      // 周卡存为 "2025-06-16~2025-06-20" 格式
+      time_slot: TIME_SLOT,
+      name: state.name, department: state.dept, employee_id: state.empId,
+      status: 'pending', is_free: false, payment_amount: amount,
       payment_screenshot: state.screenshot ? '已上传' : null
     };
+    // 周卡：把整周日期范围存入 booking_date 字段（用 weekDates[0]）
+    if (state.cardType === 'weekly' && state.weekDates.length > 0) {
+      booking.booking_date = state.weekDates[0]; // 周一日期
+    }
     const result = await createBooking(booking);
     state.orderId = result?.[0]?.id || 'N/A';
-    state.step = 6;
-    render();
+    state.step = 6; render();
   } catch(e) {
     btn.disabled = false; btn.textContent = '提交预约';
     showToast('提交失败：' + (e.message || '请重试'));
@@ -639,7 +689,10 @@ async function submitBooking() {
 }
 
 function restartBooking() {
-  state = { step: 1, gender: null, cardType: null, pod: null, date: null, timeSlot: null, name: '', dept: '', empId: '', screenshot: null, screenshotBase64: null, allPods: state.allPods, blockedDates: state.blockedDates, takenSlots: [] };
+  state = { step:1, gender:null, cardType:null, pod:null, date:null, weekDates:[],
+    name:'', dept:'', empId:'', screenshot:null,
+    allPods:state.allPods, blockedDates:state.blockedDates, takenSlots:[],
+    calYear:new Date().getFullYear(), calMonth:new Date().getMonth() };
   document.getElementById('bottomBar').style.display = 'block';
   render();
 }
@@ -649,7 +702,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ============ INIT ============
 render();
 </script>
 </body>
