@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>午休舱管理后台</title>
+<style>
+  :root {
+    --navy: #0F2340;
+    --blue: #1A4D8F;
+    --sky: #3B82C4;
+    --mist: #EDF4FB;
+    --teal: #0D7A6B;
+    --teal-light: #E0F5F1;
+    --amber: #B85C0A;
+    --amber-light: #FDF0E6;
+    --red: #A32D2D;
+    --red-light: #FDEAEA;
+    --sand: #F7F5F2;
+    --white: #FFFFFF;
+    --gray1: #1C1C1E;
+    --gray2: #48484A;
+    --gray3: #8E8E93;
+    --gray4: #C7C7CC;
+    --gray5: #F2F2F7;
+    --border: #E5E5EA;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --sidebar-w: 220px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif; background: var(--sand); color: var(--gray1); }
+
+  /* Login */
+  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--navy); }
+  .login-box { background: white; border-radius: 16px; padding: 40px 32px; width: 360px; }
+  .login-logo { text-align: center; margin-bottom: 28px; }
+  .login-logo h1 { font-size: 20px; font-weight: 700; color: var(--navy); margin-top: 8px; }
+  .login-logo p { font-size: 13px; color: var(--gray3); margin-top: 4px; }
+  .login-field { margin-bottom: 14px; }
+  .login-field label { display: block; font-size: 13px; color: var(--gray3); margin-bottom: 6px; }
+  .login-field input { width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; font-size: 15px; outline: none; transition: border-color 0.15s; }
+  .login-field input:focus { border-color: var(--blue); }
+  .login-btn { width: 100%; background: var(--blue); color: white; border: none; border-radius: var(--radius-sm); padding: 13px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+  .login-btn:hover { background: var(--navy); }
+  .login-err { color: var(--red); font-size: 13px; text-align: center; margin-top: 10px; min-height: 20px; }
+
+  /* Layout */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: var(--sidebar-w); background: var(--navy); flex-shrink: 0; position: fixed; top: 0; bottom: 0; left: 0; overflow-y: auto; z-index: 10; }
+  .sidebar-logo { padding: 20px 16px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .sidebar-logo h2 { color: white; font-size: 15px; font-weight: 600; }
+  .sidebar-logo p { color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 2px; }
+  .sidebar-nav { padding: 12px 8px; }
+  .nav-section { font-size: 10px; color: rgba(255,255,255,0.3); padding: 12px 8px 6px; letter-spacing: 0.8px; text-transform: uppercase; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: var(--radius-sm); color: rgba(255,255,255,0.65); font-size: 14px; cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+  .nav-item.active { background: var(--sky); color: white; font-weight: 500; }
+  .nav-item .badge { background: var(--amber); color: white; font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: auto; }
+  .sidebar-footer { padding: 16px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .logout-btn { width: 100%; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); border: none; border-radius: var(--radius-sm); padding: 9px; font-size: 13px; cursor: pointer; }
+  .logout-btn:hover { background: rgba(255,255,255,0.15); }
+
+  /* Main */
+  .main { margin-left: var(--sidebar-w); flex: 1; padding: 24px; min-height: 100vh; }
+  .page-header { margin-bottom: 24px; }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--navy); }
+  .page-sub { font-size: 13px; color: var(--gray3); margin-top: 4px; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: white; border-radius: var(--radius); padding: 18px; border: 1px solid var(--border); }
+  .stat-label { font-size: 12px; color: var(--gray3); margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; }
+  .stat-value.teal { color: var(--teal); }
+  .stat-value.amber { color: var(--amber); }
+  .stat-value.blue { color: var(--blue); }
+  .stat-sub { font-size: 12px; color: var(--gray3); margin-top: 6px; }
+
+  /* Card */
+  .card { background: white; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+  .card-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-head h3 { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .card-body { padding: 0; }
+
+  /* Filters */
+  .filters { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; background: var(--sand); }
+  .filter-input { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 7px 12px; font-size: 13px; background: white; outline: none; color: var(--gray1); }
+  .filter-input:focus { border-color: var(--blue); }
+  .filter-btn { background: var(--blue); color: white; border: none; border-radius: var(--radius-sm); padding: 7px 16px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .filter-btn.secondary { background: var(--gray5); color: var(--gray2); }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 500; color: var(--gray3); text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid var(--border); background: var(--sand); white-space: nowrap; }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--gray5); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--sand); }
+
+  /* Status badges */
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+  .badge.pending { background: var(--amber-light); color: var(--amber); }
+  .badge.confirmed { background: var(--teal-light); color: var(--teal); }
+  .badge.released { background: var(--gray5); color: var(--gray3); }
+  .badge.free { background: var(--mist); color: var(--blue); }
+
+  /* Action buttons */
+  .btn { display: inline-flex; align-items: center; gap: 4px; border: none; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .btn-confirm { background: var(--teal-light); color: var(--teal); }
+  .btn-confirm:hover { background: var(--teal); color: white; }
+  .btn-release { background: var(--red-light); color: var(--red); }
+  .btn-release:hover { background: var(--red); color: white; }
+  .btn-view { background: var(--mist); color: var(--blue); }
+  .btn-view:hover { background: var(--blue); color: white; }
+  .btn-primary { background: var(--blue); color: white; padding: 8px 16px; font-size: 13px; border-radius: var(--radius-sm); }
+  .btn-primary:hover { background: var(--navy); }
+  .btn-danger { background: var(--red-light); color: var(--red); padding: 8px 16px; font-size: 13px; border-radius: var(--radius-sm); }
+  .btn-danger:hover { background: var(--red); color: white; }
+
+  /* Form row */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 13px; color: var(--gray3); font-weight: 500; }
+  .form-group input, .form-group select { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 14px; outline: none; transition: border-color 0.15s; background: white; }
+  .form-group input:focus, .form-group select:focus { border-color: var(--blue); }
+  .form-actions { padding: 0 20px 20px; display: flex; gap: 10px; }
+
+  /* Pod map */
+  .pod-map { padding: 20px; }
+  .pod-map-section { margin-bottom: 20px; }
+  .pod-map-title { font-size: 13px; font-weight: 600; color: var(--gray2); margin-bottom: 10px; }
+  .pod-map-grid { display: grid; gap: 6px; }
+  .pod-map-grid.female { grid-template-columns: repeat(8, 1fr); }
+  .pod-map-grid.male { grid-template-columns: repeat(8, 1fr); }
+  .pod-map-cell { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; }
+  .pod-map-cell.available { background: var(--teal-light); color: var(--teal); border-color: #9FE1CB; }
+  .pod-map-cell.occupied { background: var(--mist); color: var(--blue); border-color: #B8D4ED; }
+  .pod-map-cell.maintenance { background: var(--amber-light); color: var(--amber); border-color: #F0C99A; }
+  .pod-map-cell.weekly-zone { border-style: dashed; }
+
+  /* Notice */
+  .notice { background: var(--amber-light); border-left: 3px solid var(--amber); padding: 10px 14px; font-size: 13px; color: var(--amber); line-height: 1.5; margin: 16px 20px 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal { background: white; border-radius: var(--radius); padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-size: 17px; font-weight: 600; margin-bottom: 16px; }
+  .modal-img { width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .modal-actions button { flex: 1; }
+
+  /* Empty */
+  .empty { text-align: center; padding: 40px 20px; color: var(--gray3); }
+  .empty-icon { font-size: 32px; margin-bottom: 10px; }
+  .empty-text { font-size: 14px; }
+
+  /* Tab */
+  .tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; }
+  .tab { padding: 12px 16px; font-size: 14px; color: var(--gray3); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 500; }
+
+  /* Chart area */
+  .chart-wrap { padding: 20px; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
+  .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { width: 100%; background: var(--mist); border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 4px; cursor: pointer; }
+  .bar:hover { background: var(--sky); }
+  .bar-label { font-size: 10px; color: var(--gray3); white-space: nowrap; }
+  .bar-val { font-size: 10px; color: var(--gray2); font-weight: 500; }
+
+  /* Toggle */
+  .toggle { position: relative; width: 44px; height: 24px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; inset: 0; background: var(--gray4); border-radius: 12px; cursor: pointer; transition: 0.2s; }
+  .toggle-slider:before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+  .toggle input:checked + .toggle-slider { background: var(--teal); }
+  .toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+  .loading { text-align: center; padding: 40px; color: var(--gray3); font-size: 14px; }
+  .tag { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 20px; background: var(--gray5); color: var(--gray2); }
+  .tag.weekly { background: var(--mist); color: var(--blue); }
+  .tag.daily { background: var(--teal-light); color: var(--teal); }
+  .tag.female { background: #FDE8F5; color: #8B2565; }
+  .tag.male { background: var(--mist); color: var(--blue); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">
+      <div style="font-size:32px">🌙</div>
+      <h1>午休舱管理后台</h1>
+      <p>仅限管理人员登录</p>
+    </div>
+    <div class="login-field">
+      <label>用户名</label>
+      <input type="text" id="loginUser" placeholder="admin" value="admin">
+    </div>
+    <div class="login-field">
+      <label>密码</label>
+      <input type="password" id="loginPass" placeholder="请输入密码" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">登录</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp" style="display:none">
+  <div class="app">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <h2>🌙 午休舱</h2>
+        <p>管理后台</p>
+      </div>
+      <div class="sidebar-nav">
+        <div class="nav-section">概览</div>
+        <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">📊 数据概览</div>
+        <div class="nav-section">预约管理</div>
+        <div class="nav-item" onclick="showPage('pending')" id="nav-pending">⏳ 待确认 <span class="badge" id="pendingBadge">0</span></div>
+        <div class="nav-item" onclick="showPage('bookings')" id="nav-bookings">📋 全部预约</div>
+        <div class="nav-item" onclick="showPage('free-booking')" id="nav-free-booking">🎟️ 免费预订</div>
+        <div class="nav-section">配置</div>
+        <div class="nav-item" onclick="showPage('pods')" id="nav-pods">🛏️ 床位管理</div>
+        <div class="nav-item" onclick="showPage('holidays')" id="nav-holidays">📅 节假日配置</div>
+      </div>
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="doLogout()">退出登录</button>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main" id="mainContent"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<script>
+// ============ CONFIG ============
+const SUPABASE_URL = 'https://fbnofibcfpdcrhuaqvgh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_jmaLdj9S1t06j-1F_dhl8Q_36cO36xc';
+const ADMIN_PASSWORD = 'admin123'; // 改成你想要的密码
+
+const DEPARTMENTS = ['战略事业部','产品技术部','市场营销部','销售运营部','客户成功部','人力资源部','财务管理部','法务合规部','品牌设计部','供应链部','数据智能部','运营中心','行政后勤部','内容创作部','商务拓展部'];
+const TIME_SLOTS = ['12:30–13:00','13:00–13:30','13:30–14:00'];
+
+let currentPage = 'dashboard';
+let allBookings = [], allPods = [], allBlocked = [];
+
+// ============ SUPABASE ============
+async function sbFetch(path, opts = {}) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  return res.json().catch(() => null);
+}
+
+async function loadAll() {
+  [allBookings, allPods, allBlocked] = await Promise.all([
+    sbFetch('bookings?select=*&order=created_at.desc').catch(()=>[]),
+    sbFetch('pods?select=*&order=gender.asc,pod_number.asc').catch(()=>[]),
+    sbFetch('blocked_dates?select=*&order=date.asc').catch(()=>[])
+  ]);
+  updatePendingBadge();
+}
+
+function updatePendingBadge() {
+  const n = allBookings.filter(b => b.status === 'pending').length;
+  const el = document.getElementById('pendingBadge');
+  if (el) { el.textContent = n; el.style.display = n > 0 ? 'inline' : 'none'; }
+}
+
+// ============ LOGIN ============
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if (user === 'admin' && pass === ADMIN_PASSWORD) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    loadAll().then(() => showPage('dashboard'));
+  } else {
+    document.getElementById('loginErr').textContent = '用户名或密码错误';
+  }
+}
+
+function doLogout() {
+  document.getElementById('adminApp').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginPass').value = '';
+}
+
+// ============ NAV ============
+function showPage(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const nav = document.getElementById('nav-' + page);
+  if (nav) nav.classList.add('active');
+  renderPage();
+}
+
+function renderPage() {
+  const c = document.getElementById('mainContent');
+  switch(currentPage) {
+    case 'dashboard': c.innerHTML = renderDashboard(); break;
+    case 'pending': c.innerHTML = renderPending(); break;
+    case 'bookings': c.innerHTML = renderBookings(); bindBookingFilters(); break;
+    case 'free-booking': c.innerHTML = renderFreeBooking(); break;
+    case 'pods': c.innerHTML = renderPods(); break;
+    case 'holidays': c.innerHTML = renderHolidays(); break;
+  }
+}
+
+// ============ DASHBOARD ============
+function renderDashboard() {
+  const today = new Date().toISOString().slice(0,10);
+  const todayB = allBookings.filter(b => b.booking_date === today);
+  const confirmedToday = todayB.filter(b => b.status === 'confirmed');
+  const revenue = allBookings.filter(b => b.status === 'confirmed' && !b.is_free).reduce((s,b) => s + (b.payment_amount||0), 0);
+  const pending = allBookings.filter(b => b.status === 'pending').length;
+  const totalPods = allPods.filter(p => p.is_active).length;
+
+  // Weekly revenue chart (last 7 days)
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    const rev = allBookings.filter(b => b.booking_date === ds && b.status === 'confirmed' && !b.is_free).reduce((s,b)=>s+(b.payment_amount||0),0);
+    const cnt = allBookings.filter(b => b.booking_date === ds && b.status === 'confirmed').length;
+    days.push({ ds, rev, cnt, label: `${d.getMonth()+1}/${d.getDate()}` });
+  }
+  const maxRev = Math.max(...days.map(d=>d.rev), 1);
+
+  const recentBookings = allBookings.slice(0, 8);
+
+  return `
+  <div class="page-header">
+    <div class="page-title">数据概览</div>
+    <div class="page-sub">今日 ${today}</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">今日预约（已确认）</div>
+      <div class="stat-value blue">${confirmedToday.length}</div>
+      <div class="stat-sub">共 ${todayB.length} 条申请</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">待确认收款</div>
+      <div class="stat-value amber">${pending}</div>
+      <div class="stat-sub">需要处理</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">累计收款</div>
+      <div class="stat-value teal">¥${revenue.toFixed(0)}</div>
+      <div class="stat-sub">已确认订单</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">可用床位</div>
+      <div class="stat-value">${totalPods}</div>
+      <div class="stat-sub">女${allPods.filter(p=>p.gender==='female'&&p.is_active).length} + 男${allPods.filter(p=>p.gender==='male'&&p.is_active).length}</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div class="card">
+      <div class="card-head"><h3>近7日收款（元）</h3></div>
+      <div class="chart-wrap">
+        <div class="bar-chart">
+          ${days.map(d=>`
+            <div class="bar-item">
+              <div class="bar-val">¥${d.rev}</div>
+              <div class="bar" style="height:${Math.max(d.rev/maxRev*100,4)}px" title="${d.ds}: ¥${d.rev}"></div>
+              <div class="bar-label">${d.label}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>近7日预约量</h3></div>
+      <div class="chart-wrap">
+        <div class="bar-chart">
+          ${days.map(d=>{const mx=Math.max(...days.map(x=>x.cnt),1);return`
+            <div class="bar-item">
+              <div class="bar-val">${d.cnt}</div>
+              <div class="bar" style="height:${Math.max(d.cnt/mx*100,4)}px;background:var(--teal-light)" title="${d.ds}: ${d.cnt}次"></div>
+              <div class="bar-label">${d.label}</div>
+            </div>
+          `}).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-head">
+      <h3>最新预约</h3>
+      <button class="btn btn-view" onclick="showPage('bookings')">查看全部</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>姓名</th><th>工号</th><th>区域/床位</th><th>日期</th><th>时段</th><th>金额</th><th>状态</th></tr></thead>
+        <tbody>
+          ${recentBookings.length === 0
+            ? `<tr><td colspan="7"><div class="empty"><div class="empty-icon">📭</div><div class="empty-text">暂无预约</div></div></td></tr>`
+            : recentBookings.map(b => `
+            <tr>
+              <td>${b.name}</td>
+              <td style="color:var(--gray3)">${b.employee_id}</td>
+              <td>${b.gender==='female'?'女舱':'男舱'} #${b.pod_number} <span class="tag ${b.card_type}">${b.card_type==='weekly'?'周卡':'日卡'}</span></td>
+              <td>${b.booking_date}</td>
+              <td>${b.time_slot}</td>
+              <td>${b.is_free ? '<span class="badge free">免费</span>' : '¥'+(b.payment_amount||0)}</td>
+              <td>${statusBadge(b.status)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// ============ PENDING ============
+function renderPending() {
+  const pending = allBookings.filter(b => b.status === 'pending');
+  return `
+  <div class="page-header">
+    <div class="page-title">待确认收款</div>
+    <div class="page-sub">确认收款后预约正式生效</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>待处理（${pending.length}）</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>提交时间</th><th>姓名</th><th>事业群</th><th>工号</th><th>区域/床位</th><th>日期</th><th>时段</th><th>金额</th><th>截图</th><th>操作</th></tr></thead>
+        <tbody>
+          ${pending.length === 0
+            ? `<tr><td colspan="10"><div class="empty"><div class="empty-icon">✅</div><div class="empty-text">没有待确认的预约</div></div></td></tr>`
+            : pending.map(b=>`
+            <tr>
+              <td style="color:var(--gray3);font-size:12px">${b.created_at?.slice(0,16).replace('T',' ')}</td>
+              <td><strong>${b.name}</strong></td>
+              <td style="color:var(--gray3)">${b.department}</td>
+              <td style="color:var(--gray3)">${b.employee_id}</td>
+              <td>${b.gender==='female'?'女舱':'男舱'} #${b.pod_number}</td>
+              <td>${b.booking_date}</td>
+              <td>${b.time_slot}</td>
+              <td><strong>¥${b.payment_amount||0}</strong></td>
+              <td>${b.payment_screenshot && b.payment_screenshot !== '已上传'
+                ? `<button class="btn btn-view" onclick="viewScreenshot('${b.id}')">查看</button>`
+                : `<span style="color:var(--gray4);font-size:12px">${b.payment_screenshot||'未上传'}</span>`}</td>
+              <td style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-confirm" onclick="confirmBooking('${b.id}')">✓ 确认</button>
+                <button class="btn btn-release" onclick="rejectBooking('${b.id}')">✗ 拒绝</button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+async function confirmBooking(id) {
+  if (!confirm('确认收款并激活此预约？')) return;
+  await sbFetch(`bookings?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'confirmed', confirmed_at: new Date().toISOString() }) });
+  await loadAll(); renderPage();
+}
+
+async function rejectBooking(id) {
+  if (!confirm('确定拒绝此预约？将标记为已释放。')) return;
+  await sbFetch(`bookings?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'released' }) });
+  await loadAll(); renderPage();
+}
+
+// ============ ALL BOOKINGS ============
+let bookingFilter = { date: '', gender: '', status: '', search: '' };
+
+function renderBookings() {
+  let filtered = allBookings;
+  if (bookingFilter.date) filtered = filtered.filter(b => b.booking_date === bookingFilter.date);
+  if (bookingFilter.gender) filtered = filtered.filter(b => b.gender === bookingFilter.gender);
+  if (bookingFilter.status) filtered = filtered.filter(b => b.status === bookingFilter.status);
+  if (bookingFilter.search) {
+    const s = bookingFilter.search.toLowerCase();
+    filtered = filtered.filter(b => b.name?.includes(s) || b.employee_id?.includes(s) || b.department?.includes(s));
+  }
+  const todayRevenue = filtered.filter(b=>b.status==='confirmed'&&!b.is_free).reduce((s,b)=>s+(b.payment_amount||0),0);
+  return `
+  <div class="page-header">
+    <div class="page-title">全部预约</div>
+    <div class="page-sub">共 ${filtered.length} 条记录，确认收款 ¥${todayRevenue}</div>
+  </div>
+  <div class="card">
+    <div class="filters">
+      <input class="filter-input" id="fDate" type="date" value="${bookingFilter.date}" placeholder="日期" onchange="bookingFilter.date=this.value;renderPage()">
+      <select class="filter-input" id="fGender" onchange="bookingFilter.gender=this.value;renderPage()">
+        <option value="">全部区域</option>
+        <option value="female" ${bookingFilter.gender==='female'?'selected':''}>女舱</option>
+        <option value="male" ${bookingFilter.gender==='male'?'selected':''}>男舱</option>
+      </select>
+      <select class="filter-input" id="fStatus" onchange="bookingFilter.status=this.value;renderPage()">
+        <option value="">全部状态</option>
+        <option value="pending" ${bookingFilter.status==='pending'?'selected':''}>待确认</option>
+        <option value="confirmed" ${bookingFilter.status==='confirmed'?'selected':''}>已确认</option>
+        <option value="released" ${bookingFilter.status==='released'?'selected':''}>已释放</option>
+      </select>
+      <input class="filter-input" id="fSearch" value="${bookingFilter.search}" placeholder="搜索姓名/工号" oninput="bookingFilter.search=this.value;renderPage()">
+      <button class="filter-btn secondary" onclick="bookingFilter={date:'',gender:'',status:'',search:''};renderPage()">清除</button>
+      <button class="filter-btn" onclick="exportCSV(filtered_bookings)">导出 CSV</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>日期</th><th>时段</th><th>姓名</th><th>事业群</th><th>工号</th><th>区域/床位</th><th>类型</th><th>金额</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>
+          ${filtered.length === 0
+            ? `<tr><td colspan="10"><div class="empty"><div class="empty-icon">📭</div><div class="empty-text">没有符合条件的预约</div></div></td></tr>`
+            : filtered.map(b=>`
+            <tr>
+              <td>${b.booking_date}</td>
+              <td style="white-space:nowrap">${b.time_slot}</td>
+              <td><strong>${b.name}</strong></td>
+              <td style="color:var(--gray3)">${b.department}</td>
+              <td style="color:var(--gray3)">${b.employee_id}</td>
+              <td>${b.gender==='female'?'女舱':'男舱'} #${b.pod_number}</td>
+              <td><span class="tag ${b.card_type}">${b.card_type==='weekly'?'周卡':'日卡'}</span></td>
+              <td>${b.is_free ? '<span class="badge free">免费</span>' : '¥'+(b.payment_amount||0)}</td>
+              <td>${statusBadge(b.status)}</td>
+              <td>
+                ${b.status==='confirmed' ? `<button class="btn btn-release" onclick="releasePod('${b.id}')">释放</button>` : ''}
+                ${b.status==='pending' ? `<button class="btn btn-confirm" onclick="confirmBooking('${b.id}')">确认</button>` : ''}
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// expose filtered for export
+let filtered_bookings = [];
+function bindBookingFilters() { filtered_bookings = allBookings; }
+
+async function releasePod(id) {
+  if (!confirm('确定释放此床位？预约将被取消，该床位可重新预订。')) return;
+  await sbFetch(`bookings?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'released' }) });
+  await loadAll(); renderPage();
+}
+
+function exportCSV() {
+  let filtered = allBookings;
+  if (bookingFilter.date) filtered = filtered.filter(b => b.booking_date === bookingFilter.date);
+  if (bookingFilter.gender) filtered = filtered.filter(b => b.gender === bookingFilter.gender);
+  if (bookingFilter.status) filtered = filtered.filter(b => b.status === bookingFilter.status);
+  if (bookingFilter.search) {
+    const s = bookingFilter.search.toLowerCase();
+    filtered = filtered.filter(b => b.name?.includes(s) || b.employee_id?.includes(s));
+  }
+  const header = '日期,时段,姓名,事业群,工号,区域,床位,卡类型,金额,是否免费,状态,提交时间';
+  const rows = filtered.map(b =>
+    [b.booking_date,b.time_slot,b.name,b.department,b.employee_id,b.gender==='female'?'女舱':'男舱',b.pod_number,b.card_type==='weekly'?'周卡':'日卡',b.payment_amount||0,b.is_free?'是':'否',b.status,b.created_at?.slice(0,16)].join(',')
+  );
+  const csv = [header,...rows].join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`预约记录_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+}
+
+// ============ FREE BOOKING ============
+function renderFreeBooking() {
+  return `
+  <div class="page-header">
+    <div class="page-title">管理员免费预订</div>
+    <div class="page-sub">为员工直接创建预约，无需付款</div>
+  </div>
+  <div class="card">
+    <div class="notice" style="margin:20px 20px 0">管理员预订自动确认，无需付款流程，直接生效。</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>姓名</label>
+        <input id="fb-name" placeholder="员工姓名">
+      </div>
+      <div class="form-group">
+        <label>工号</label>
+        <input id="fb-empid" placeholder="工号">
+      </div>
+      <div class="form-group">
+        <label>事业群</label>
+        <select id="fb-dept">
+          <option value="">请选择</option>
+          ${DEPARTMENTS.map(d=>`<option value="${d}">${d}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>区域</label>
+        <select id="fb-gender">
+          <option value="female">女舱</option>
+          <option value="male">男舱</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>卡类型</label>
+        <select id="fb-cardtype">
+          <option value="daily">日卡</option>
+          <option value="weekly">周卡</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>床位号</label>
+        <input id="fb-pod" type="number" min="1" max="46" placeholder="床位号">
+      </div>
+      <div class="form-group">
+        <label>日期</label>
+        <input id="fb-date" type="date" value="${new Date().toISOString().slice(0,10)}">
+      </div>
+      <div class="form-group">
+        <label>时段</label>
+        <select id="fb-slot">
+          ${TIME_SLOTS.map(t=>`<option value="${t}">${t}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="submitFreeBooking()">确认创建预约</button>
+    </div>
+  </div>`;
+}
+
+async function submitFreeBooking() {
+  const name = document.getElementById('fb-name').value.trim();
+  const empId = document.getElementById('fb-empid').value.trim();
+  const dept = document.getElementById('fb-dept').value;
+  const gender = document.getElementById('fb-gender').value;
+  const cardType = document.getElementById('fb-cardtype').value;
+  const podNum = parseInt(document.getElementById('fb-pod').value);
+  const date = document.getElementById('fb-date').value;
+  const slot = document.getElementById('fb-slot').value;
+  if (!name || !empId || !dept || !podNum || !date) { alert('请填写完整信息'); return; }
+  const podObj = allPods.find(p => p.gender === gender && p.pod_number === podNum);
+  try {
+    await sbFetch('bookings', { method: 'POST', prefer: 'return=representation', body: JSON.stringify({
+      pod_id: podObj?.id, gender, pod_number: podNum, card_type: cardType,
+      booking_date: date, time_slot: slot, name, department: dept, employee_id: empId,
+      status: 'confirmed', is_free: true, payment_amount: 0, confirmed_at: new Date().toISOString()
+    })});
+    alert('✅ 免费预约创建成功！');
+    await loadAll(); renderPage();
+  } catch(e) { alert('创建失败：' + e.message); }
+}
+
+// ============ PODS ============
+function renderPods() {
+  const femalePods = allPods.filter(p => p.gender === 'female');
+  const malePods = allPods.filter(p => p.gender === 'male');
+
+  const todayStr = new Date().toISOString().slice(0,10);
+  const todayOccupied = new Set(
+    allBookings.filter(b => b.booking_date === todayStr && b.status === 'confirmed').map(b => `${b.gender}-${b.pod_number}`)
+  );
+
+  function podCell(p) {
+    const isMaint = !p.is_active;
+    const isOcc = todayOccupied.has(`${p.gender}-${p.pod_number}`);
+    const cls = isMaint ? 'maintenance' : isOcc ? 'occupied' : 'available';
+    const weeklyClass = p.card_type === 'weekly' ? ' weekly-zone' : '';
+    const label = isMaint ? '维修' : isOcc ? '使用中' : '可用';
+    return `<div class="pod-map-cell ${cls}${weeklyClass}" onclick="toggleMaintenance('${p.id}',${p.is_active})" title="${p.gender==='female'?'女':'男'}舱 #${p.pod_number} - 点击切换维修状态">
+      <div style="font-weight:600">${p.pod_number}</div>
+      <div style="font-size:9px;opacity:0.7">${label}</div>
+    </div>`;
+  }
+
+  return `
+  <div class="page-header">
+    <div class="page-title">床位管理</div>
+    <div class="page-sub">点击床位可切换维修状态；今日占用情况实时显示</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>图例</h3></div>
+    <div style="display:flex;gap:16px;padding:12px 20px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px"><div style="width:16px;height:16px;border-radius:4px;background:var(--teal-light);border:1px solid #9FE1CB"></div>可用</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px"><div style="width:16px;height:16px;border-radius:4px;background:var(--mist);border:1px solid #B8D4ED"></div>今日使用中</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px"><div style="width:16px;height:16px;border-radius:4px;background:var(--amber-light);border:1px solid #F0C99A"></div>维修中（点击恢复）</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px"><div style="width:16px;height:16px;border-radius:4px;border:1.5px dashed var(--sky)"></div>周卡专属</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>女舱（${femalePods.filter(p=>p.is_active).length}/${femalePods.length} 可用）</h3></div>
+    <div class="pod-map">
+      <div class="pod-map-grid female">${femalePods.map(podCell).join('')}</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>男舱（${malePods.filter(p=>p.is_active).length}/${malePods.length} 可用）</h3></div>
+    <div class="pod-map">
+      <div class="pod-map-grid male">${malePods.map(podCell).join('')}</div>
+    </div>
+  </div>`;
+}
+
+async function toggleMaintenance(id, currentlyActive) {
+  const msg = currentlyActive ? '将此床位标记为维修中？用户将无法预订。' : '恢复此床位为可用状态？';
+  if (!confirm(msg)) return;
+  await sbFetch(`pods?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ is_active: !currentlyActive }) });
+  await loadAll(); renderPage();
+}
+
+// ============ HOLIDAYS ============
+function renderHolidays() {
+  const upcoming = allBlocked.filter(d => d.date >= new Date().toISOString().slice(0,10));
+  const past = allBlocked.filter(d => d.date < new Date().toISOString().slice(0,10));
+  return `
+  <div class="page-header">
+    <div class="page-title">节假日 / 封闭日期</div>
+    <div class="page-sub">配置后，该日期用户无法预订任何床位</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>添加封闭日期</h3></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>日期</label>
+        <input type="date" id="hDate" value="${new Date().toISOString().slice(0,10)}">
+      </div>
+      <div class="form-group">
+        <label>原因说明</label>
+        <input id="hReason" placeholder="如：国庆假期、设备维护">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="addBlockedDate()">添加</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>即将封闭（${upcoming.length}天）</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>日期</th><th>原因</th><th>添加时间</th><th>操作</th></tr></thead>
+        <tbody>
+          ${upcoming.length === 0
+            ? `<tr><td colspan="4"><div class="empty"><div class="empty-icon">📅</div><div class="empty-text">没有配置封闭日期</div></div></td></tr>`
+            : upcoming.map(d=>`
+            <tr>
+              <td><strong>${d.date}</strong></td>
+              <td>${d.reason||'—'}</td>
+              <td style="color:var(--gray3);font-size:12px">${d.created_at?.slice(0,16).replace('T',' ')}</td>
+              <td><button class="btn btn-release" onclick="removeBlockedDate(${d.id})">删除</button></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  ${past.length > 0 ? `
+  <div class="card">
+    <div class="card-head"><h3>历史封闭（${past.length}天）</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>日期</th><th>原因</th></tr></thead>
+        <tbody>${past.slice(0,10).map(d=>`<tr><td>${d.date}</td><td>${d.reason||'—'}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+  </div>` : ''}`;
+}
+
+async function addBlockedDate() {
+  const date = document.getElementById('hDate').value;
+  const reason = document.getElementById('hReason').value.trim();
+  if (!date) { alert('请选择日期'); return; }
+  try {
+    await sbFetch('blocked_dates', { method: 'POST', body: JSON.stringify({ date, reason }) });
+    await loadAll(); renderPage();
+  } catch(e) { alert('添加失败（该日期可能已存在）'); }
+}
+
+async function removeBlockedDate(id) {
+  if (!confirm('确定删除此封闭日期？')) return;
+  await sbFetch(`blocked_dates?id=eq.${id}`, { method: 'DELETE' });
+  await loadAll(); renderPage();
+}
+
+// ============ HELPERS ============
+function statusBadge(status) {
+  const map = { pending: '⏳ 待确认', confirmed: '✅ 已确认', released: '🔓 已释放' };
+  const cls = { pending: 'pending', confirmed: 'confirmed', released: 'released' };
+  return `<span class="badge ${cls[status]||''}">${map[status]||status}</span>`;
+}
+
+function viewScreenshot(id) {
+  const b = allBookings.find(x => x.id === id);
+  if (!b) return;
+  document.getElementById('modalBox').innerHTML = `
+    <h3>付款截图 — ${b.name}</h3>
+    <p style="font-size:13px;color:var(--gray3);margin-bottom:12px">${b.booking_date} ${b.time_slot} · ¥${b.payment_amount}</p>
+    ${b.payment_screenshot && b.payment_screenshot !== '已上传'
+      ? `<img src="${b.payment_screenshot}" class="modal-img">`
+      : `<div style="background:var(--gray5);border-radius:8px;padding:40px;text-align:center;color:var(--gray3)">截图数据不可用</div>`}
+    <div class="modal-actions">
+      <button class="btn btn-confirm" style="flex:1;padding:10px" onclick="confirmBooking('${id}');closeModal()">✓ 确认收款</button>
+      <button class="btn btn-release" style="flex:1;padding:10px" onclick="rejectBooking('${id}');closeModal()">✗ 拒绝</button>
+    </div>`;
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>
