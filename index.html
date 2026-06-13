@@ -2,169 +2,441 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>午休舱预订</title>
 <style>
-  :root {
-    --navy: #0F2340; --blue: #1A4D8F; --sky: #3B82C4; --mist: #EDF4FB;
-    --teal: #0D7A6B; --teal-light: #E0F5F1; --amber: #B85C0A; --amber-light: #FDF0E6;
-    --sand: #F7F5F2; --white: #FFFFFF;
-    --gray1: #1C1C1E; --gray2: #48484A; --gray3: #8E8E93; --gray4: #C7C7CC; --gray5: #F2F2F7;
-    --border: #E5E5EA; --radius: 12px; --radius-sm: 8px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif; background: var(--sand); color: var(--gray1); min-height: 100vh; }
-  .header { background: var(--navy); padding: 0 20px; position: sticky; top: 0; z-index: 100; }
-  .header-inner { max-width: 480px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
-  .header h1 { color: white; font-size: 17px; font-weight: 600; }
-  .header-sub { color: rgba(255,255,255,0.5); font-size: 12px; }
-  .progress-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 20px; }
-  .progress-inner { max-width: 480px; margin: 0 auto; display: flex; }
-  .prog-step { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; color: var(--gray4); border-bottom: 2px solid transparent; transition: all 0.2s; }
-  .prog-step.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 500; }
-  .prog-step.done { color: var(--teal); border-bottom-color: var(--teal); }
-  .content { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
-  .section-title { font-size: 13px; font-weight: 500; color: var(--gray3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; margin-top: 24px; }
-  .section-title:first-child { margin-top: 0; }
-  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .card-option { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: all 0.15s; }
-  .card-option:hover { border-color: var(--sky); }
-  .card-option.selected { border-color: var(--blue); background: var(--mist); }
-  .card-option.disabled { opacity: 0.4; cursor: not-allowed; background: var(--gray5); }
-  .card-icon { font-size: 24px; margin-bottom: 8px; }
-  .card-title { font-size: 15px; font-weight: 600; color: var(--gray1); margin-bottom: 4px; }
-  .card-desc { font-size: 12px; color: var(--gray3); line-height: 1.5; }
-  .card-price { font-size: 18px; font-weight: 700; color: var(--blue); margin-top: 8px; }
-  .card-badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 20px; margin-top: 6px; font-weight: 500; }
-  .card-badge.discount { background: var(--amber-light); color: var(--amber); }
-  .card-badge.instant { background: var(--teal-light); color: var(--teal); }
-  /* Pod grid */
-  .pods-legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--gray3); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-  .pods-grid { display: grid; gap: 6px; }
-  .pods-grid.female { grid-template-columns: repeat(8, 1fr); }
-  .pods-grid.male { grid-template-columns: repeat(8, 1fr); }
-  .pod-cell { aspect-ratio: 1; border: 1.5px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: var(--white); transition: all 0.15s; }
-  .pod-cell.weekly-type { border-style: dashed; border-color: var(--sky); }
-  .pod-cell:hover:not(.occupied):not(.locked) { border-color: var(--blue); background: var(--mist); }
-  .pod-cell.selected { border-color: var(--blue); border-style: solid; background: var(--blue); color: white; }
-  .pod-cell.occupied { background: var(--gray5); color: var(--gray4); cursor: not-allowed; border-color: var(--border); border-style: solid; }
-  .pod-cell.locked { background: var(--gray5); color: var(--gray4); cursor: not-allowed; opacity: 0.4; }
-  .pod-num { font-size: 12px; font-weight: 600; line-height: 1; }
-  /* Date picker - calendar style */
-  .calendar-wrap { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
-  .calendar-header { background: var(--navy); color: white; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
-  .calendar-month { font-size: 15px; font-weight: 600; }
-  .calendar-nav { background: rgba(255,255,255,0.15); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
-  .calendar-nav:hover { background: rgba(255,255,255,0.25); }
-  .calendar-dow { display: grid; grid-template-columns: repeat(7,1fr); background: var(--sand); }
-  .calendar-dow-cell { text-align: center; padding: 8px 0; font-size: 11px; color: var(--gray3); font-weight: 500; }
-  .calendar-dow-cell.weekend { color: var(--amber); }
-  .calendar-days { display: grid; grid-template-columns: repeat(7,1fr); padding: 8px; gap: 4px; }
-  .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 14px; font-weight: 400; cursor: pointer; transition: all 0.15s; color: var(--gray1); }
-  .cal-day:hover:not(.cal-disabled):not(.cal-empty) { background: var(--mist); color: var(--blue); }
-  .cal-day.cal-today { font-weight: 700; color: var(--blue); }
-  .cal-day.cal-selected { background: var(--blue); color: white; font-weight: 600; }
-  .cal-day.cal-selected.cal-today { background: var(--blue); }
-  .cal-day.cal-disabled { color: var(--gray4); cursor: not-allowed; background: none; }
-  .cal-day.cal-empty { cursor: default; }
-  .cal-day.cal-weekend { color: var(--amber); }
-  .cal-day.cal-weekend.cal-selected { color: white; }
-  .cal-day.cal-past { color: var(--gray4); cursor: not-allowed; }
-  /* Time slot - single big button */
-  .time-big-btn { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; cursor: pointer; transition: all 0.15s; }
-  .time-big-btn:hover { border-color: var(--sky); background: var(--mist); }
-  .time-big-btn.selected { border-color: var(--blue); background: var(--blue); color: white; }
-  .time-big-btn.occupied { background: var(--gray5); color: var(--gray4); cursor: not-allowed; }
-  .time-big-label { font-size: 20px; font-weight: 700; }
-  .time-big-sub { font-size: 12px; margin-top: 4px; opacity: 0.7; }
-  /* Form */
-  .form-group { margin-bottom: 14px; }
-  .form-label { font-size: 13px; color: var(--gray3); margin-bottom: 6px; display: block; }
-  .form-input { width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; font-size: 15px; color: var(--gray1); background: var(--white); outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
-  .form-input:focus { border-color: var(--blue); }
-  select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
-  /* Summary */
-  .summary-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin: 16px 0; }
-  .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; }
-  .summary-row:not(:last-child) { border-bottom: 1px solid var(--gray5); }
-  .summary-label { color: var(--gray3); }
-  .summary-value { color: var(--gray1); font-weight: 500; text-align: right; }
-  .summary-total .summary-label { color: var(--gray1); font-weight: 600; font-size: 15px; }
-  .summary-total .summary-value { color: var(--blue); font-size: 18px; font-weight: 700; }
-  /* Pay */
-  .pay-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; }
-  .pay-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-  .pay-amount { font-size: 32px; font-weight: 700; color: var(--blue); margin: 8px 0 4px; }
-  .pay-amount-sub { font-size: 12px; color: var(--gray3); margin-bottom: 16px; }
-  .qr-placeholder { width: 160px; height: 160px; background: var(--gray5); border-radius: var(--radius-sm); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--gray3); border: 1px dashed var(--gray4); text-align: center; line-height: 1.5; }
-  .pay-hint { font-size: 12px; color: var(--gray3); line-height: 1.6; margin-bottom: 16px; }
-  .pay-methods { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
-  .pay-method-badge { font-size: 12px; color: var(--gray3); background: var(--gray5); padding: 4px 10px; border-radius: 20px; }
-  /* Upload */
-  .upload-area { border: 2px dashed var(--border); border-radius: var(--radius); padding: 24px; text-align: center; cursor: pointer; transition: all 0.15s; background: var(--white); }
-  .upload-area:hover { border-color: var(--sky); background: var(--mist); }
-  .upload-area.has-file { border-color: var(--teal); background: var(--teal-light); }
-  .upload-icon { font-size: 28px; margin-bottom: 8px; }
-  .upload-text { font-size: 13px; color: var(--gray3); }
-  .upload-text strong { color: var(--gray1); }
-  #fileInput { display: none; }
-  .upload-preview { max-width: 100%; max-height: 200px; border-radius: var(--radius-sm); margin-top: 12px; }
-  /* Bottom */
-  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--border); padding: 12px 16px; z-index: 100; }
-  .bottom-inner { max-width: 480px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
-  .btn-back { background: var(--gray5); color: var(--gray2); border: none; border-radius: var(--radius-sm); padding: 13px 20px; font-size: 15px; font-weight: 500; cursor: pointer; flex-shrink: 0; }
-  .btn-next { flex: 1; background: var(--blue); color: white; border: none; border-radius: var(--radius-sm); padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-  .btn-next:hover:not(:disabled) { background: var(--navy); }
-  .btn-next:disabled { background: var(--gray4); cursor: not-allowed; }
-  /* Notice */
-  .notice { background: var(--amber-light); border-left: 3px solid var(--amber); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 10px 14px; font-size: 13px; color: var(--amber); line-height: 1.5; margin-bottom: 16px; }
-  .notice-blue { background: var(--mist); border-left: 3px solid var(--blue); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 10px 14px; font-size: 13px; color: var(--blue); line-height: 1.5; margin-bottom: 16px; }
-  /* Success */
-  .success-screen { text-align: center; padding: 40px 20px; }
-  .success-icon { width: 72px; height: 72px; background: var(--teal-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px; }
-  .success-title { font-size: 22px; font-weight: 700; color: var(--gray1); margin-bottom: 8px; }
-  .success-sub { font-size: 14px; color: var(--gray3); margin-bottom: 24px; line-height: 1.6; }
-  .ticket { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: left; max-width: 320px; margin: 0 auto 24px; position: relative; overflow: hidden; }
-  .ticket::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--blue), var(--teal)); }
-  .ticket-id { font-size: 11px; color: var(--gray3); margin-bottom: 14px; font-family: monospace; }
-  .ticket-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; border-bottom: 1px solid var(--gray5); }
-  .ticket-row:last-child { border-bottom: none; }
-  .ticket-row span:first-child { color: var(--gray3); }
-  .ticket-row span:last-child { font-weight: 500; color: var(--gray1); }
-  .ticket-amount { font-size: 20px; font-weight: 700; color: var(--teal); }
-  .pending-notice { background: var(--amber-light); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; color: var(--amber); line-height: 1.6; max-width: 320px; margin: 0 auto 20px; text-align: left; }
-  .btn-restart { background: var(--gray5); color: var(--gray2); border: none; border-radius: var(--radius-sm); padding: 12px 24px; font-size: 14px; font-weight: 500; cursor: pointer; }
-  .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: var(--gray1); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
-  .toast.show { opacity: 1; }
-  .weekly-dates-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; }
-  .weekly-dates-title { font-size: 13px; color: var(--gray3); margin-bottom: 8px; }
-  .weekly-dates-list { display: flex; flex-wrap: wrap; gap: 6px; }
-  .weekly-date-tag { background: var(--mist); color: var(--blue); font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+:root {
+  --bg: #1a2a3a;
+  --bg2: #243447;
+  --bg3: #2e4060;
+  --card: rgba(255,255,255,0.07);
+  --card-border: rgba(255,255,255,0.12);
+  --card-selected: rgba(255,255,255,0.18);
+  --accent: #7EC8C8;
+  --accent2: #5BA8A8;
+  --accent-soft: rgba(126,200,200,0.15);
+  --gold: #E8C97A;
+  --gold-soft: rgba(232,201,122,0.15);
+  --danger: #E87A7A;
+  --danger-soft: rgba(232,122,122,0.12);
+  --text: #F0F4F8;
+  --text2: rgba(240,244,248,0.65);
+  --text3: rgba(240,244,248,0.38);
+  --border: rgba(255,255,255,0.10);
+  --r: 16px;
+  --r-sm: 10px;
+  --r-xs: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  background: linear-gradient(160deg, #1a2a3a 0%, #1e3a4a 40%, #1a3040 100%);
+  min-height: 100vh;
+  color: var(--text);
+}
+
+/* ── Header ── */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(26,42,58,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  safe-area-inset-top: env(safe-area-inset-top);
+}
+.header-inner {
+  max-width: 520px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+}
+.header-logo { display: flex; align-items: center; gap: 8px; }
+.header-logo span { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+.header-tag {
+  font-size: 11px; color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 9px; border-radius: 20px; font-weight: 500;
+}
+
+/* ── Progress ── */
+.progress-bar {
+  background: rgba(26,42,58,0.7);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+}
+.progress-inner { max-width: 520px; margin: 0 auto; display: flex; }
+.prog-step {
+  flex: 1; padding: 10px 0; text-align: center;
+  font-size: 10px; color: var(--text3);
+  border-bottom: 2px solid transparent; transition: all 0.25s;
+}
+.prog-step.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.prog-step.done { color: var(--text3); border-bottom-color: rgba(126,200,200,0.3); }
+
+/* ── Content ── */
+.content { max-width: 520px; margin: 0 auto; padding: 24px 16px 120px; }
+
+/* ── Section label ── */
+.sec-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 1px;
+  color: var(--text3); text-transform: uppercase;
+  margin-bottom: 10px; margin-top: 28px;
+}
+.sec-label:first-child { margin-top: 0; }
+
+/* ── Intro banner ── */
+.intro-banner {
+  background: linear-gradient(135deg, rgba(126,200,200,0.18), rgba(91,168,168,0.08));
+  border: 1px solid rgba(126,200,200,0.2);
+  border-radius: var(--r);
+  padding: 20px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.intro-moon { font-size: 36px; margin-bottom: 8px; }
+.intro-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.intro-sub { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+/* ── Card grid ── */
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.card-opt {
+  background: var(--card); border: 1.5px solid var(--card-border);
+  border-radius: var(--r); padding: 18px 14px;
+  cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+}
+.card-opt::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(126,200,200,0.0), rgba(126,200,200,0.0));
+  transition: all 0.2s;
+}
+.card-opt:active { transform: scale(0.97); }
+.card-opt.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.card-opt.selected::before {
+  background: linear-gradient(135deg, rgba(126,200,200,0.08), transparent);
+}
+.card-opt.unavail { opacity: 0.35; cursor: not-allowed; }
+.card-opt.unavail:active { transform: none; }
+.card-emoji { font-size: 26px; margin-bottom: 10px; }
+.card-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.card-desc { font-size: 12px; color: var(--text2); line-height: 1.55; }
+.card-price {
+  font-size: 20px; font-weight: 800; color: var(--accent);
+  margin-top: 10px; letter-spacing: -0.5px;
+}
+.card-price small { font-size: 12px; font-weight: 400; color: var(--text3); }
+.card-pill {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  padding: 3px 8px; border-radius: 20px; margin-top: 6px;
+}
+.pill-open { background: rgba(126,200,200,0.18); color: var(--accent); }
+.pill-closed { background: rgba(240,244,248,0.08); color: var(--text3); }
+.pill-gold { background: var(--gold-soft); color: var(--gold); }
+.checkmark {
+  position: absolute; top: 12px; right: 12px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--accent); display: none;
+  align-items: center; justify-content: center; font-size: 10px;
+}
+.card-opt.selected .checkmark { display: flex; }
+
+/* ── Pod grid ── */
+.pods-section { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--r); padding: 16px; }
+.pods-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text3); }
+.leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.pods-grid { display: grid; gap: 5px; }
+.pods-grid.female { grid-template-columns: repeat(8, 1fr); }
+.pods-grid.male { grid-template-columns: repeat(8, 1fr); }
+@media (max-width: 400px) {
+  .pods-grid.female { grid-template-columns: repeat(8, 1fr); gap: 3px; }
+  .pods-grid.male { grid-template-columns: repeat(8, 1fr); gap: 3px; }
+}
+.pod {
+  aspect-ratio: 1; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  transition: all 0.15s;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06); color: var(--text2);
+}
+.pod.weekly-type { border-style: dashed; border-color: rgba(126,200,200,0.4); }
+.pod:active:not(.pod-occ):not(.pod-locked) { transform: scale(0.92); }
+.pod.pod-sel {
+  background: var(--accent); border-color: var(--accent);
+  color: #1a2a3a; font-weight: 700; border-style: solid;
+}
+.pod.pod-occ {
+  background: rgba(255,255,255,0.03); color: var(--text3);
+  cursor: not-allowed; border-color: rgba(255,255,255,0.06);
+  position: relative;
+}
+.pod.pod-occ::after {
+  content: ''; position: absolute; inset: 3px;
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 2px,
+    rgba(255,255,255,0.06) 2px, rgba(255,255,255,0.06) 4px
+  );
+  border-radius: 3px;
+}
+.pod.pod-locked { opacity: 0.2; cursor: not-allowed; }
+
+/* ── Calendar ── */
+.cal-wrap {
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: var(--r); overflow: hidden; margin-bottom: 16px;
+}
+.cal-head {
+  padding: 16px; display: flex; align-items: center; justify-content: space-between;
+  background: rgba(126,200,200,0.08);
+}
+.cal-month { font-size: 16px; font-weight: 700; color: var(--text); }
+.cal-nav {
+  background: rgba(255,255,255,0.1); border: none; color: var(--text);
+  width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+  font-size: 16px; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.cal-nav:active { background: rgba(255,255,255,0.2); }
+.cal-dow { display: grid; grid-template-columns: repeat(7,1fr); }
+.cal-dow-cell {
+  text-align: center; padding: 8px 0;
+  font-size: 10px; color: var(--text3); font-weight: 600; letter-spacing: 0.3px;
+}
+.cal-dow-cell.we { color: rgba(232,201,122,0.6); }
+.cal-days { display: grid; grid-template-columns: repeat(7,1fr); padding: 8px; gap: 3px; }
+.cal-d {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; font-size: 13px; cursor: pointer;
+  transition: all 0.15s; color: var(--text2); font-weight: 500;
+}
+.cal-d:active:not(.cal-dis):not(.cal-empty) { transform: scale(0.88); }
+.cal-d.cal-today { color: var(--accent); font-weight: 700; }
+.cal-d.cal-sel { background: var(--accent); color: #1a2a3a; font-weight: 700; }
+.cal-d.cal-dis { color: var(--text3); cursor: not-allowed; opacity: 0.4; }
+.cal-d.cal-we { color: rgba(232,201,122,0.7); }
+.cal-d.cal-we.cal-sel { color: #1a2a3a; }
+.cal-d.cal-empty { cursor: default; }
+.cal-d.cal-blocked { color: var(--danger); opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+
+/* ── Time slot ── */
+.time-slot-btn {
+  background: var(--card); border: 1.5px solid var(--card-border);
+  border-radius: var(--r); padding: 20px;
+  text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.time-slot-btn.sel {
+  border-color: var(--accent); background: var(--accent-soft);
+}
+.time-slot-btn.full {
+  opacity: 0.4; cursor: not-allowed;
+  border-color: var(--danger); background: var(--danger-soft);
+}
+.time-slot-time { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+.time-slot-sub { font-size: 12px; color: var(--text2); margin-top: 5px; }
+
+/* ── Weekly dates ── */
+.week-preview {
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: var(--r); padding: 16px; margin-bottom: 14px;
+}
+.week-preview-label { font-size: 11px; color: var(--text3); margin-bottom: 10px; font-weight: 600; letter-spacing: 0.5px; }
+.week-dates { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
+.week-date-cell {
+  background: var(--accent-soft); border: 1px solid rgba(126,200,200,0.2);
+  border-radius: var(--r-xs); padding: 8px 4px; text-align: center;
+}
+.week-date-dow { font-size: 10px; color: var(--accent); font-weight: 600; margin-bottom: 3px; }
+.week-date-num { font-size: 13px; color: var(--text); font-weight: 700; }
+
+/* ── Form ── */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; color: var(--text3); margin-bottom: 7px; display: block; font-weight: 600; letter-spacing: 0.3px; }
+.form-input {
+  width: 100%; background: var(--card); border: 1.5px solid var(--card-border);
+  border-radius: var(--r-sm); padding: 13px 16px;
+  font-size: 16px; color: var(--text); outline: none;
+  transition: border-color 0.15s; -webkit-appearance: none;
+  caret-color: var(--accent);
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--text3); }
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(240,244,248,0.4)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px;
+}
+select.form-input option { background: #243447; color: var(--text); }
+
+/* ── Summary box ── */
+.summary {
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: var(--r); padding: 16px; margin: 16px 0;
+}
+.sum-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; }
+.sum-row + .sum-row { border-top: 1px solid rgba(255,255,255,0.06); }
+.sum-label { font-size: 13px; color: var(--text3); }
+.sum-val { font-size: 13px; color: var(--text2); font-weight: 500; text-align: right; }
+.sum-row.total .sum-label { font-size: 15px; font-weight: 700; color: var(--text); }
+.sum-row.total .sum-val { font-size: 20px; font-weight: 800; color: var(--accent); }
+
+/* ── Pay box ── */
+.pay-box {
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: var(--r); padding: 24px 20px; text-align: center; margin-bottom: 20px;
+}
+.pay-tag { font-size: 12px; color: var(--text3); margin-bottom: 4px; }
+.pay-amount { font-size: 44px; font-weight: 900; color: var(--accent); letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+.pay-amount-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+.pay-qr-wrap { width: 160px; height: 160px; margin: 0 auto 16px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+.pay-qr-placeholder {
+  width: 100%; height: 100%; background: rgba(255,255,255,0.04);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--text3); gap: 6px; line-height: 1.5; text-align: center;
+}
+.pay-methods { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.pay-method { font-size: 11px; color: var(--text3); background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 20px; }
+.pay-note { font-size: 12px; color: var(--text3); line-height: 1.7; }
+.pay-note strong { color: var(--accent); }
+
+/* ── Upload ── */
+.upload-area {
+  border: 2px dashed rgba(255,255,255,0.15); border-radius: var(--r);
+  padding: 28px 20px; text-align: center; cursor: pointer;
+  transition: all 0.2s; background: var(--card);
+}
+.upload-area:active { transform: scale(0.98); }
+.upload-area.has-file { border-color: var(--accent); background: var(--accent-soft); }
+.upload-icon { font-size: 32px; margin-bottom: 8px; }
+.upload-text { font-size: 13px; color: var(--text3); }
+.upload-text strong { color: var(--text2); }
+#fileInput { display: none; }
+.upload-preview { max-width: 100%; max-height: 180px; border-radius: 10px; margin-top: 14px; }
+
+/* ── Notice ── */
+.notice {
+  border-radius: var(--r-sm); padding: 11px 14px;
+  font-size: 12px; line-height: 1.6; margin-bottom: 14px;
+}
+.notice-info { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(126,200,200,0.2); }
+.notice-warn { background: var(--gold-soft); color: var(--gold); border: 1px solid rgba(232,201,122,0.2); }
+
+/* ── Bottom bar ── */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(26,42,58,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 100;
+}
+.bottom-inner { max-width: 520px; margin: 0 auto; display: flex; gap: 10px; }
+.btn-back {
+  background: rgba(255,255,255,0.08); color: var(--text2);
+  border: none; border-radius: var(--r-sm); padding: 14px 20px;
+  font-size: 15px; font-weight: 600; cursor: pointer; flex-shrink: 0;
+  transition: background 0.15s;
+}
+.btn-back:active { background: rgba(255,255,255,0.14); }
+.btn-next {
+  flex: 1; background: var(--accent); color: #1a2a3a;
+  border: none; border-radius: var(--r-sm); padding: 15px;
+  font-size: 16px; font-weight: 800; cursor: pointer;
+  transition: all 0.15s; letter-spacing: -0.3px;
+}
+.btn-next:active:not(:disabled) { transform: scale(0.97); background: var(--accent2); }
+.btn-next:disabled { background: rgba(255,255,255,0.1); color: var(--text3); cursor: not-allowed; }
+
+/* ── Success ── */
+.success-wrap { text-align: center; padding: 20px 0 40px; }
+.success-anim { font-size: 56px; margin-bottom: 16px; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.success-title { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.success-sub { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 28px; }
+.ticket {
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: var(--r); padding: 20px; text-align: left;
+  max-width: 340px; margin: 0 auto 20px; position: relative; overflow: hidden;
+}
+.ticket::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--gold));
+}
+.ticket-id { font-size: 10px; color: var(--text3); margin-bottom: 14px; font-family: monospace; }
+.ticket-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.ticket-row + .ticket-row { border-top: 1px solid rgba(255,255,255,0.06); }
+.ticket-row span:first-child { font-size: 12px; color: var(--text3); }
+.ticket-row span:last-child { font-size: 13px; font-weight: 600; color: var(--text); }
+.ticket-amount { font-size: 22px; font-weight: 900; color: var(--accent); }
+.pending-box {
+  background: var(--gold-soft); border: 1px solid rgba(232,201,122,0.2);
+  border-radius: var(--r-sm); padding: 12px 14px;
+  font-size: 12px; color: var(--gold); line-height: 1.7;
+  max-width: 340px; margin: 0 auto 24px; text-align: left;
+}
+.btn-restart {
+  background: rgba(255,255,255,0.08); color: var(--text2);
+  border: none; border-radius: var(--r-sm); padding: 12px 28px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+
+/* ── Loading ── */
+.loading-dots { text-align: center; padding: 30px; color: var(--text3); font-size: 13px; }
+.dot { display: inline-block; animation: blink 1.4s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+  background: rgba(26,42,58,0.95); border: 1px solid var(--border);
+  color: var(--text); padding: 10px 20px; border-radius: 24px;
+  font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.2s;
+  pointer-events: none; white-space: nowrap; backdrop-filter: blur(10px);
+}
+.toast.show { opacity: 1; }
+
+/* ── Mobile tweaks ── */
+@media (max-width: 360px) {
+  .card-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .card-opt { padding: 14px 10px; }
+  .card-name { font-size: 14px; }
+  .card-price { font-size: 17px; }
+  .pod { font-size: 10px; }
+  .content { padding: 16px 12px 110px; }
+}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="header-inner">
-    <h1>🌙 午休舱预订</h1>
-    <span class="header-sub">12:30–14:00</span>
+    <div class="header-logo">
+      <span>🌙 午休舱</span>
+    </div>
+    <span class="header-tag">12:30–14:00</span>
   </div>
 </div>
 
 <div class="progress-bar">
   <div class="progress-inner">
-    <div class="prog-step active" id="ps1">选区域</div>
-    <div class="prog-step" id="ps2">选床位</div>
-    <div class="prog-step" id="ps3">选时间</div>
-    <div class="prog-step" id="ps4">填信息</div>
+    <div class="prog-step active" id="ps1">区域</div>
+    <div class="prog-step" id="ps2">床位</div>
+    <div class="prog-step" id="ps3">时间</div>
+    <div class="prog-step" id="ps4">信息</div>
     <div class="prog-step" id="ps5">付款</div>
     <div class="prog-step" id="ps6">完成</div>
   </div>
 </div>
 
-<div class="content" id="appContent"></div>
+<div class="content" id="app"></div>
 
 <div class="bottom-bar" id="bottomBar">
   <div class="bottom-inner">
@@ -176,530 +448,489 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ── Config ──
 const SUPABASE_URL = 'https://fbnofibcfpdcrhuaqvgh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_jmaLdj9S1t06j-1F_dhl8Q_36cO36xc';
-const QR_CODE_URL = 'YOUR_QR_CODE_IMAGE_URL';
+const QR_CODE_URL  = 'YOUR_QR_CODE_IMAGE_URL';
+const TIME_SLOT    = '12:30–14:00';
 
-// ✅ 真实事业群名称
-const DEPARTMENTS = [
-  '总经办',
-  '三七游戏-研发事业群',
-  '37手游',
-  '37网游事业群',
-  '37GAMES-海外发行事业群',
-  '财管与风控事业群',
-  '技术中心',
-  '人力资源行政中心',
-  '战略管理中心',
-  '设计中心',
-  '产品合作中心',
-  '轻悠部落',
-  '神鞠工作室',
-  '火凤凰',
-  '妙小程'
+const DEPTS = [
+  '总经办','三七游戏-研发事业群','37手游','37网游事业群',
+  '37GAMES-海外发行事业群','财管与风控事业群','技术中心',
+  '人力资源行政中心','战略管理中心','设计中心','产品合作中心',
+  '轻悠部落','神鞠工作室','火凤凰','妙小程'
 ];
 
-// ✅ 只有一个完整时段
-const TIME_SLOT = '12:30–14:00';
-
-let state = {
-  step: 1, gender: null, cardType: null, pod: null,
-  date: null, weekDates: [],   // weekDates: 周卡对应的周一~周五日期
-  name: '', dept: '', empId: '',
-  screenshot: null,
-  allPods: [], blockedDates: [], takenSlots: [],
-  calYear: new Date().getFullYear(), calMonth: new Date().getMonth()
+let S = {
+  step:1, gender:null, cardType:null, pod:null,
+  date:null, weekDates:[],
+  name:'', dept:'', empId:'',
+  screenshot:null, orderId:null,
+  allPods:[], blockedDates:[], bookedPodsOnDate:new Set(),
+  calY:new Date().getFullYear(), calM:new Date().getMonth()
 };
 
-// ============ SUPABASE ============
-async function sbFetch(path, opts = {}) {
-  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-    headers: {
-      'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json', 'Prefer': opts.prefer || 'return=representation',
+// ── Supabase ──
+async function sb(path, opts={}) {
+  const r = await fetch(SUPABASE_URL+'/rest/v1/'+path, {
+    headers:{
+      'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,
+      'Content-Type':'application/json','Prefer':opts.prefer||'return=representation',
       ...opts.headers
-    }, ...opts
+    },...opts
   });
-  if (!res.ok) { const e = await res.text(); throw new Error(e); }
-  return res.json().catch(() => null);
+  if(!r.ok){const e=await r.text();throw new Error(e);}
+  return r.json().catch(()=>null);
 }
 
-async function loadPods() { return sbFetch('pods?select=*&is_active=eq.true&order=pod_number.asc'); }
-async function loadBlockedDates() {
-  const from = new Date().toISOString().slice(0,10);
-  return sbFetch(`blocked_dates?date=gte.${from}&select=date`);
-}
-async function loadTakenSlots(podId, date) {
-  return sbFetch(`bookings?pod_id=eq.${podId}&booking_date=eq.${date}&status=in.(pending,confirmed)&select=time_slot`);
-}
-async function createBooking(data) {
-  return sbFetch('bookings', { method: 'POST', prefer: 'return=representation', body: JSON.stringify(data) });
-}
-
-// ============ TIME RULES ============
-function isBookingOpen(cardType) {
-  const now = new Date();
-  const h = now.getHours(), m = now.getMinutes();
-  const mins = h * 60 + m;
-  if (cardType === 'daily') return mins >= 9*60 && mins < 14*60;
-  if (cardType === 'weekly') {
-    const dow = now.getDay(); // 0=Sun,1=Mon...4=Thu
-    const thu9 = dow === 4 && mins >= 9*60;
-    const fri = dow === 5, sat = dow === 6, sun = dow === 0;
-    const monBefore14 = dow === 1 && mins < 14*60;
-    return thu9 || fri || sat || sun || monBefore14;
+// ── Time rules ──
+function bookingOpen(type) {
+  const now=new Date(), h=now.getHours(), m=now.getMinutes(), mins=h*60+m, dow=now.getDay();
+  if(type==='daily') return mins>=9*60 && mins<14*60;
+  if(type==='weekly'){
+    return (dow===4&&mins>=9*60)||dow===5||dow===6||dow===0||(dow===1&&mins<14*60);
   }
   return false;
 }
 
-// ✅ 周卡：返回当前可预订周次的周一~周五日期
-function getWeeklyDates() {
-  const now = new Date();
-  const dow = now.getDay(); // 0=Sun
-  // 找到"下一个周一"（如果今天是周四~周一，是本周或下周）
-  let monday = new Date(now);
-  // 从周四开始预订下周一~周五
-  // 规则：上周四9:00 ~ 本周一14:00 预订本周
-  // 所以我们找"当前应该预订哪周"
-  if (dow === 4 || dow === 5 || dow === 6 || dow === 0) {
-    // 周四~周日：预订下周
-    const daysToMonday = (8 - dow) % 7 || 7;
-    monday.setDate(now.getDate() + daysToMonday);
-  } else if (dow === 1) {
-    // 周一：预订本周
-    monday.setDate(now.getDate());
+function getWeekDates() {
+  const now=new Date(), dow=now.getDay();
+  let mon=new Date(now);
+  if(dow===4||dow===5||dow===6||dow===0){
+    const d=(8-dow)%7||7; mon.setDate(now.getDate()+d);
+  } else if(dow===1){
+    mon.setDate(now.getDate());
   } else {
-    // 周二周三：理论上不开放，但以防万一预订下周
-    const daysToMonday = (8 - dow) % 7;
-    monday.setDate(now.getDate() + daysToMonday);
+    const d=(8-dow)%7; mon.setDate(now.getDate()+d);
   }
-  const dates = [];
-  for (let i = 0; i < 5; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    dates.push(d.toISOString().slice(0, 10));
-  }
-  return dates;
+  return Array.from({length:5},(_,i)=>{
+    const d=new Date(mon); d.setDate(mon.getDate()+i);
+    return d.toISOString().slice(0,10);
+  });
 }
 
-// ============ CALENDAR ============
-function renderCalendar() {
-  const blocked = new Set(state.blockedDates.map(d => d.date));
-  const today = new Date(); today.setHours(0,0,0,0);
-  const todayStr = today.toISOString().slice(0,10);
-  const y = state.calYear, m = state.calMonth;
-  const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  const firstDay = new Date(y, m, 1).getDay(); // 0=Sun
-  const daysInMonth = new Date(y, m+1, 0).getDate();
-  const startOffset = firstDay === 0 ? 6 : firstDay - 1; // Mon-based offset
+// ── Load data ──
+async function loadBase() {
+  const [pods, blocked] = await Promise.all([
+    sb('pods?select=*&is_active=eq.true&order=pod_number.asc').catch(()=>[]),
+    sb('blocked_dates?select=date').catch(()=>[])
+  ]);
+  S.allPods = pods||[];
+  S.blockedDates = blocked||[];
+}
 
-  let days = '';
-  for (let i = 0; i < startOffset; i++) days += `<div class="cal-day cal-empty"></div>`;
+// ✅ 关键：加载某日期已被预约的床位（pending + confirmed 都算占用）
+async function loadBookedPods(date) {
+  if(!date){S.bookedPodsOnDate=new Set();return;}
+  const rows = await sb(
+    `bookings?booking_date=eq.${date}&status=in.(pending,confirmed)&gender=eq.${S.gender}&select=pod_number`
+  ).catch(()=>[]);
+  S.bookedPodsOnDate = new Set((rows||[]).map(r=>r.pod_number));
+}
 
-  const nowMins = new Date().getHours()*60 + new Date().getMinutes();
+// ── Saved user ──
+function savedUser(){try{return JSON.parse(localStorage.getItem('spUser')||'{}');}catch{return {};}}
+function saveUser(n,d,e){localStorage.setItem('spUser',JSON.stringify({name:n,dept:d,empId:e}));}
 
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dateObj = new Date(y, m, d);
-    const dow = dateObj.getDay(); // 0=Sun,6=Sat
-    const isPast = dateObj < today;
-    const isToday = dateStr === todayStr;
-    const isBlocked = blocked.has(dateStr);
-    const isWeekend = dow === 0 || dow === 6;
+// ── Render engine ──
+function render(){
+  updateProgress(); updateBottom();
+  const c=document.getElementById('app');
+  const pages={1:s1,2:s2,3:s3,4:s4,5:s5,6:s6};
+  c.innerHTML=(pages[S.step]||s1)();
+  afterRender();
+}
 
-    let disabled = isPast || isBlocked;
-    if (state.cardType === 'daily') {
-      if (isWeekend) disabled = true;
-      if (isToday && nowMins >= 14*60) disabled = true; // past 14:00 today
-      if (!isToday && !isPast && isWeekend) disabled = true;
-    }
-    if (state.cardType === 'weekly') {
-      // For weekly, date selection is auto - handled by getWeeklyDates()
-      disabled = true; // calendar not used for weekly
-    }
+function afterRender(){
+  if(S.step===3&&S.cardType==='weekly') setTimeout(()=>setNext(true),50);
+  if(S.step===3&&S.cardType==='daily'&&S.date) setTimeout(()=>setNext(true),50);
+  if(S.step===4) setTimeout(checkForm,50);
+}
 
-    const cls = [
-      'cal-day',
-      isPast ? 'cal-past' : '',
-      isToday ? 'cal-today' : '',
-      isWeekend ? 'cal-weekend' : '',
-      disabled ? 'cal-disabled' : '',
-      state.date === dateStr ? 'cal-selected' : ''
-    ].filter(Boolean).join(' ');
-
-    days += `<div class="${cls}" ${!disabled ? `onclick="selDate('${dateStr}')"` : ''}>${d}</div>`;
+function updateProgress(){
+  for(let i=1;i<=6;i++){
+    const el=document.getElementById('ps'+i);
+    if(el) el.className='prog-step'+(i===S.step?' active':i<S.step?' done':'');
   }
+}
 
+function updateBottom(){
+  const back=document.getElementById('btnBack'), next=document.getElementById('btnNext');
+  if(!back||!next)return;
+  back.style.display=(S.step>1&&S.step<6)?'block':'none';
+  document.getElementById('bottomBar').style.display=S.step===6?'none':'block';
+  next.disabled=true;
+  next.textContent=S.step===5?'确认预约':'下一步';
+}
+
+function setNext(ok){ const b=document.getElementById('btnNext'); if(b) b.disabled=!ok; }
+
+// ── Step 1: 选区域+卡类型 ──
+function s1(){
+  const dOpen=bookingOpen('daily'), wOpen=bookingOpen('weekly');
   return `
-  <div class="calendar-wrap">
-    <div class="calendar-header">
-      <button class="calendar-nav" onclick="changeMonth(-1)">‹</button>
-      <span class="calendar-month">${y}年 ${monthNames[m]}</span>
-      <button class="calendar-nav" onclick="changeMonth(1)">›</button>
+  <div class="intro-banner">
+    <div class="intro-moon">🌙</div>
+    <div class="intro-title">午休舱预订</div>
+    <div class="intro-sub">每天 12:30–14:00 开放<br>付款后预约正式生效</div>
+  </div>
+
+  <div class="sec-label">选择区域</div>
+  <div class="card-grid" style="margin-bottom:20px">
+    <div class="card-opt ${S.gender==='female'?'selected':''}" onclick="pick('gender','female')">
+      <div class="checkmark">✓</div>
+      <div class="card-emoji">🌸</div>
+      <div class="card-name">女舱</div>
+      <div class="card-desc">共 16 床<br>私密安静</div>
     </div>
-    <div class="calendar-dow">
-      <div class="calendar-dow-cell">一</div><div class="calendar-dow-cell">二</div>
-      <div class="calendar-dow-cell">三</div><div class="calendar-dow-cell">四</div>
-      <div class="calendar-dow-cell">五</div>
-      <div class="calendar-dow-cell weekend">六</div><div class="calendar-dow-cell weekend">日</div>
-    </div>
-    <div class="calendar-days">${days}</div>
-  </div>`;
-}
-
-function changeMonth(delta) {
-  state.calMonth += delta;
-  if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
-  if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
-  document.getElementById('appContent').innerHTML = renderStep3();
-  bindStepEvents();
-}
-
-// ============ SAVED USER INFO ============
-function loadSavedInfo() { try { return JSON.parse(localStorage.getItem('sleepPodUser') || '{}'); } catch(e) { return {}; } }
-function saveUserInfo(name, dept, empId) { localStorage.setItem('sleepPodUser', JSON.stringify({name, dept, empId})); }
-
-// ============ RENDER ============
-function render() {
-  updateProgressBar(); updateBottomBar();
-  const c = document.getElementById('appContent');
-  if (state.step === 1) c.innerHTML = renderStep1();
-  else if (state.step === 2) c.innerHTML = renderStep2();
-  else if (state.step === 3) c.innerHTML = renderStep3();
-  else if (state.step === 4) c.innerHTML = renderStep4();
-  else if (state.step === 5) c.innerHTML = renderStep5();
-  else if (state.step === 6) c.innerHTML = renderStep6();
-  bindStepEvents();
-}
-
-function renderStep1() {
-  const dailyOpen = isBookingOpen('daily'), weeklyOpen = isBookingOpen('weekly');
-  return `
-  <div class="section-title">选择区域</div>
-  <div class="card-grid">
-    <div class="card-option ${state.gender==='female'?'selected':''}" onclick="selGender('female')">
-      <div class="card-icon">🌸</div><div class="card-title">女舱</div>
-      <div class="card-desc">共 16 个床位<br>私密安静</div>
-    </div>
-    <div class="card-option ${state.gender==='male'?'selected':''}" onclick="selGender('male')">
-      <div class="card-icon">🔵</div><div class="card-title">男舱</div>
-      <div class="card-desc">共 46 个床位<br>宽敞舒适</div>
+    <div class="card-opt ${S.gender==='male'?'selected':''}" onclick="pick('gender','male')">
+      <div class="checkmark">✓</div>
+      <div class="card-emoji">🔷</div>
+      <div class="card-name">男舱</div>
+      <div class="card-desc">共 46 床<br>宽敞舒适</div>
     </div>
   </div>
-  <div class="section-title">选择卡类型</div>
+
+  <div class="sec-label">选择类型</div>
   <div class="card-grid">
-    <div class="card-option ${state.cardType==='daily'?'selected':''} ${!dailyOpen?'disabled':''}" onclick="${dailyOpen?'selCardType(\'daily\')':''}">
-      <div class="card-icon">📅</div><div class="card-title">日卡</div>
-      <div class="card-desc">单次使用<br>当天 9:00 起可订，14:00 关闭</div>
-      <div class="card-price">¥10<span style="font-size:12px;font-weight:400;color:var(--gray3)">/次</span></div>
-      ${dailyOpen ? '<span class="card-badge instant">现在可订</span>' : '<span class="card-badge" style="background:var(--gray5);color:var(--gray3)">暂未开放</span>'}
+    <div class="card-opt ${S.cardType==='daily'?'selected':''} ${!dOpen?'unavail':''}"
+         onclick="${dOpen?"pick('cardType','daily')":""}">
+      <div class="checkmark">✓</div>
+      <div class="card-emoji">📅</div>
+      <div class="card-name">日卡</div>
+      <div class="card-desc">单次使用<br>当天 9:00 开放<br>14:00 截止</div>
+      <div class="card-price">¥10 <small>/次</small></div>
+      <span class="card-pill ${dOpen?'pill-open':'pill-closed'}">${dOpen?'现在可订':'暂未开放'}</span>
     </div>
-    <div class="card-option ${state.cardType==='weekly'?'selected':''} ${!weeklyOpen?'disabled':''}" onclick="${weeklyOpen?'selCardType(\'weekly\')':''}">
-      <div class="card-icon">📆</div><div class="card-title">周卡</div>
-      <div class="card-desc">一次预订整周（周一~周五）<br>上周四9:00起可订</div>
-      <div class="card-price">¥40<span style="font-size:12px;font-weight:400;color:var(--gray3)">/周</span></div>
-      ${weeklyOpen ? '<span class="card-badge discount">8折 · 5天打包</span>' : '<span class="card-badge" style="background:var(--gray5);color:var(--gray3)">暂未开放</span>'}
+    <div class="card-opt ${S.cardType==='weekly'?'selected':''} ${!wOpen?'unavail':''}"
+         onclick="${wOpen?"pick('cardType','weekly')":""}">
+      <div class="checkmark">✓</div>
+      <div class="card-emoji">📆</div>
+      <div class="card-name">周卡</div>
+      <div class="card-desc">一次预订整周<br>周一至周五<br>上周四 9:00 开放</div>
+      <div class="card-price">¥40 <small>/周</small></div>
+      <span class="card-pill ${wOpen?'pill-gold':'pill-closed'}">${wOpen?'8折优惠':'暂未开放'}</span>
     </div>
   </div>`;
 }
 
-function renderStep2() {
-  const isFemale = state.gender === 'female';
-  const total = isFemale ? 16 : 46;
-  const weeklyStart = isFemale ? 9 : 24;
-  const occupied = new Set(state.allPods.filter(p => p.gender === state.gender && !p.is_active).map(p => p.pod_number));
+// ── Step 2: 选床位 ──
+function s2(){
+  const isFemale=S.gender==='female';
+  const total=isFemale?16:46, weeklyStart=isFemale?9:24;
+  const maintenance=new Set(S.allPods.filter(p=>p.gender===S.gender&&!p.is_active).map(p=>p.pod_number));
+  // ✅ 已预约床位（含 pending）
+  const booked=S.bookedPodsOnDate;
 
-  let cells = '';
-  for (let i = 1; i <= total; i++) {
-    const isWeekly = i >= weeklyStart;
-    const isMyType = (state.cardType === 'weekly') === isWeekly;
-    const isOcc = occupied.has(i);
-    const locked = !isMyType;
-    const sel = state.pod === i;
-    let cls = 'pod-cell';
-    if (isWeekly) cls += ' weekly-type';
-    if (locked) cls += ' locked';
-    else if (isOcc) cls += ' occupied';
-    else if (sel) cls += ' selected';
-    const click = (!locked && !isOcc) ? `onclick="selPod(${i})"` : '';
-    cells += `<div class="${cls}" ${click}><span class="pod-num">${i}</span></div>`;
+  let cells='';
+  for(let i=1;i<=total;i++){
+    const isWeekly=i>=weeklyStart;
+    const myType=(S.cardType==='weekly')===isWeekly;
+    const isMaint=maintenance.has(i);
+    const isBooked=booked.has(i);
+    const locked=!myType;
+    const occ=isMaint||isBooked;
+    const sel=S.pod===i;
+    let cls='pod'+(isWeekly?' weekly-type':'')+(locked?' pod-locked':occ?' pod-occ':sel?' pod-sel':'');
+    const click=(!locked&&!occ)?`onclick="pickPod(${i})"`:'';
+    cells+=`<div class="${cls}" ${click}>${i}</div>`;
   }
 
   return `
-  <div class="notice-blue">仅显示「${state.cardType==='weekly'?'周卡专属（虚线框）':'日卡（实线框）'}」床位，灰色为不可用</div>
-  <div class="pods-legend">
-    <div class="legend-item"><div class="legend-dot" style="background:white;border:1.5px solid #E5E5EA"></div>可选</div>
-    <div class="legend-item"><div class="legend-dot" style="background:white;border:1.5px dashed #3B82C4"></div>周卡专属</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#1A4D8F"></div>已选</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#F2F2F7"></div>不可用</div>
+  <div class="notice notice-info">
+    ${S.cardType==='weekly'?'虚线框 = 周卡专属床位':'实线框 = 日卡床位'} · 斜线格 = 已被预约
   </div>
-  <div class="pods-grid ${state.gender}">${cells}</div>`;
+  <div class="pods-section">
+    <div class="pods-legend">
+      <div class="leg"><div class="leg-dot" style="background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12)"></div>可选</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(126,200,200,0.15);border:1.5px solid rgba(126,200,200,0.4)"></div>已选</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)"></div>已预约</div>
+    </div>
+    <div class="pods-grid ${S.gender}">${cells}</div>
+  </div>`;
 }
 
-function renderStep3() {
-  if (state.cardType === 'weekly') {
-    // 周卡：自动计算本周日期，不需要用户选择
-    const weekDates = getWeeklyDates();
-    state.weekDates = weekDates;
-    state.date = weekDates[0]; // 周一作为主日期
-    // 自动设为已选
-    setTimeout(() => { document.getElementById('btnNext').disabled = false; }, 50);
-    const dayNames = ['周一','周二','周三','周四','周五'];
+// ── Step 3: 选时间 ──
+function s3(){
+  if(S.cardType==='weekly'){
+    const wDates=getWeekDates();
+    S.weekDates=wDates; S.date=wDates[0];
+    const dayNames=['周一','周二','周三','周四','周五'];
     return `
-    <div class="section-title">预订时间</div>
-    <div class="notice-blue">周卡一次预订整周，以下5天全部预订同一床位</div>
-    <div class="weekly-dates-box">
-      <div class="weekly-dates-title">预订日期</div>
-      <div class="weekly-dates-list">
-        ${weekDates.map((d,i) => `<span class="weekly-date-tag">${dayNames[i]} ${d.slice(5).replace('-','/')}</span>`).join('')}
+    <div class="sec-label">预订周期</div>
+    <div class="week-preview">
+      <div class="week-preview-label">以下 5 天将预订同一床位</div>
+      <div class="week-dates">
+        ${wDates.map((d,i)=>`
+        <div class="week-date-cell">
+          <div class="week-date-dow">${dayNames[i]}</div>
+          <div class="week-date-num">${d.slice(5).replace('-','/')}</div>
+        </div>`).join('')}
       </div>
     </div>
-    <div class="section-title">时段</div>
-    <div class="time-big-btn selected">
-      <div class="time-big-label">12:30–14:00</div>
-      <div class="time-big-sub">每天午休时段，共5天</div>
+    <div class="sec-label">时段</div>
+    <div class="time-slot-btn sel">
+      <div class="time-slot-time">12:30 – 14:00</div>
+      <div class="time-slot-sub">每天午休 · 共 5 天</div>
     </div>`;
   }
 
-  // 日卡：日历选日期
+  // 日卡：日历
+  const blocked=new Set(S.blockedDates.map(d=>d.date));
+  const today=new Date(); today.setHours(0,0,0,0);
+  const todayStr=today.toISOString().slice(0,10);
+  const nowMins=new Date().getHours()*60+new Date().getMinutes();
+  const y=S.calY, m=S.calM;
+  const monthNames=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const firstDow=new Date(y,m,1).getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const offset=firstDow===0?6:firstDow-1;
+
+  let days='';
+  for(let i=0;i<offset;i++) days+=`<div class="cal-d cal-empty"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dObj=new Date(y,m,d);
+    const dow=dObj.getDay(), isPast=dObj<today, isToday=ds===todayStr;
+    const isWe=dow===0||dow===6;
+    const isBlocked=blocked.has(ds);
+    let dis=isPast||isBlocked||isWe;
+    if(isToday&&nowMins>=14*60) dis=true;
+    const cls=['cal-d',
+      isToday&&!dis?'cal-today':'',
+      S.date===ds?'cal-sel':'',
+      isBlocked?'cal-blocked':dis?'cal-dis':'',
+      isWe&&!dis?'cal-we':''
+    ].filter(Boolean).join(' ');
+    days+=`<div class="${cls}" ${!dis?`onclick="pickDate('${ds}')"`:''}>${d}</div>`;
+  }
+
   return `
-  <div class="section-title">选择日期</div>
-  ${renderCalendar()}
-  ${state.date ? `
-  <div class="section-title">时段</div>
-  <div class="time-big-btn selected" onclick="selTime()">
-    <div class="time-big-label">12:30–14:00</div>
-    <div class="time-big-sub">午休时段（共90分钟）</div>
-  </div>` : ''}`;
+  <div class="sec-label">选择日期</div>
+  <div class="cal-wrap">
+    <div class="cal-head">
+      <button class="cal-nav" onclick="chMonth(-1)">‹</button>
+      <span class="cal-month">${y} 年 ${monthNames[m]}</span>
+      <button class="cal-nav" onclick="chMonth(1)">›</button>
+    </div>
+    <div class="cal-dow">
+      <div class="cal-dow-cell">一</div><div class="cal-dow-cell">二</div>
+      <div class="cal-dow-cell">三</div><div class="cal-dow-cell">四</div>
+      <div class="cal-dow-cell">五</div>
+      <div class="cal-dow-cell we">六</div><div class="cal-dow-cell we">日</div>
+    </div>
+    <div class="cal-days">${days}</div>
+  </div>
+  ${S.date?`
+  <div class="sec-label">时段</div>
+  <div class="time-slot-btn sel">
+    <div class="time-slot-time">12:30 – 14:00</div>
+    <div class="time-slot-sub">午休时段（90 分钟）</div>
+  </div>
+  <div class="notice notice-info" style="margin-top:10px">已选日期：${S.date}，时段固定，点击"下一步"继续</div>`:''}`;
 }
 
-function renderStep4() {
-  const saved = loadSavedInfo();
-  const name = state.name || saved.name || '';
-  const dept = state.dept || saved.dept || '';
-  const empId = state.empId || saved.empId || '';
-  const amount = state.cardType === 'weekly' ? 40 : 10;
-  const dateDisplay = state.cardType === 'weekly'
-    ? `${state.weekDates[0]} 至 ${state.weekDates[4]}（5天）`
-    : state.date;
-
+// ── Step 4: 填信息 ──
+function s4(){
+  const sv=savedUser();
+  const name=S.name||sv.name||'', dept=S.dept||sv.dept||'', empId=S.empId||sv.empId||'';
+  const amount=S.cardType==='weekly'?40:10;
+  const dateDisp=S.cardType==='weekly'?`${S.weekDates[0]} 至 ${S.weekDates[4]}（5天）`:S.date;
   return `
-  ${(name||dept||empId) ? '<div class="notice-blue">已自动填入上次信息，如有变化请修改</div>' : ''}
+  ${(name||dept||empId)?'<div class="notice notice-info">已自动填入上次信息，如有变化请修改</div>':''}
   <div class="form-group">
     <label class="form-label">姓名</label>
-    <input class="form-input" id="fName" value="${name}" placeholder="请输入真实姓名" oninput="onFormChange()">
+    <input class="form-input" id="fName" value="${name}" placeholder="请输入真实姓名" oninput="checkForm()">
   </div>
   <div class="form-group">
     <label class="form-label">事业群</label>
-    <select class="form-input" id="fDept" onchange="onFormChange()">
+    <select class="form-input" id="fDept" onchange="checkForm()">
       <option value="">请选择事业群</option>
-      ${DEPARTMENTS.map(d => `<option value="${d}" ${dept===d?'selected':''}>${d}</option>`).join('')}
+      ${DEPTS.map(d=>`<option value="${d}"${dept===d?' selected':''}>${d}</option>`).join('')}
     </select>
   </div>
   <div class="form-group">
     <label class="form-label">工号</label>
-    <input class="form-input" id="fEmpId" value="${empId}" placeholder="请输入工号" oninput="onFormChange()">
+    <input class="form-input" id="fEmpId" value="${empId}" placeholder="请输入工号" oninput="checkForm()">
   </div>
-  <div class="summary-box">
-    <div class="summary-row"><span class="summary-label">区域</span><span class="summary-value">${state.gender==='female'?'女舱':'男舱'}</span></div>
-    <div class="summary-row"><span class="summary-label">床位</span><span class="summary-value">床位 #${state.pod}</span></div>
-    <div class="summary-row"><span class="summary-label">日期</span><span class="summary-value">${dateDisplay}</span></div>
-    <div class="summary-row"><span class="summary-label">时段</span><span class="summary-value">12:30–14:00</span></div>
-    <div class="summary-row summary-total"><span class="summary-label">应付金额</span><span class="summary-value">¥${amount}</span></div>
+  <div class="summary">
+    <div class="sum-row"><span class="sum-label">区域</span><span class="sum-val">${S.gender==='female'?'女舱':'男舱'}</span></div>
+    <div class="sum-row"><span class="sum-label">床位</span><span class="sum-val">床位 #${S.pod}</span></div>
+    <div class="sum-row"><span class="sum-label">类型</span><span class="sum-val">${S.cardType==='weekly'?'周卡（5天）':'日卡（单次）'}</span></div>
+    <div class="sum-row"><span class="sum-label">日期</span><span class="sum-val">${dateDisp}</span></div>
+    <div class="sum-row"><span class="sum-label">时段</span><span class="sum-val">12:30–14:00</span></div>
+    <div class="sum-row total"><span class="sum-label">应付金额</span><span class="sum-val">¥${amount}</span></div>
   </div>`;
 }
 
-function renderStep5() {
-  const amount = state.cardType === 'weekly' ? 40 : 10;
-  const qrIsReal = QR_CODE_URL !== 'YOUR_QR_CODE_IMAGE_URL';
+// ── Step 5: 付款 ──
+function s5(){
+  const amount=S.cardType==='weekly'?40:10;
+  const qrOk=QR_CODE_URL!=='YOUR_QR_CODE_IMAGE_URL';
   return `
   <div class="pay-box">
-    <div class="pay-title">扫码支付</div>
+    <div class="pay-tag">应付金额</div>
     <div class="pay-amount">¥${amount}</div>
-    <div class="pay-amount-sub">${state.cardType==='weekly'?'周卡 5天 × ¥8/次':'日卡 单次'}</div>
-    ${qrIsReal
-      ? `<img src="${QR_CODE_URL}" style="width:160px;height:160px;border-radius:8px;margin:0 auto 12px;display:block;">`
-      : `<div class="qr-placeholder">请联系管理员<br>上传收款码图片</div>`}
-    <div class="pay-methods">
-      <span class="pay-method-badge">支付宝</span>
-      <span class="pay-method-badge">银联</span>
-      <span class="pay-method-badge">云闪付</span>
+    <div class="pay-amount-sub">${S.cardType==='weekly'?'5 天 × ¥8 = ¥40（8折）':'日卡单次'}</div>
+    <div class="pay-qr-wrap">
+      ${qrOk?`<img src="${QR_CODE_URL}" style="width:100%;height:100%;object-fit:cover">`
+        :`<div class="pay-qr-placeholder">📱<br>请联系管理员<br>上传收款码</div>`}
     </div>
-    <div class="pay-hint">付款备注：<strong>${state.name || ''} ${state.empId || ''}</strong><br>支付完成后上传付款截图</div>
+    <div class="pay-methods">
+      <span class="pay-method">支付宝</span>
+      <span class="pay-method">银联</span>
+      <span class="pay-method">云闪付</span>
+    </div>
+    <div class="pay-note">付款备注请填写：<strong>${S.name} ${S.empId}</strong><br>支付完成后，请上传付款截图</div>
   </div>
-  <div class="section-title" style="margin-top:20px">上传付款截图</div>
-  <div class="upload-area ${state.screenshot?'has-file':''}" onclick="document.getElementById('fileInput').click()">
-    <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)">
-    ${state.screenshot
-      ? `<div class="upload-icon">✅</div><div class="upload-text"><strong>截图已上传</strong><br>点击重新选择</div>
-         <img src="${state.screenshot}" class="upload-preview">`
-      : `<div class="upload-icon">📸</div><div class="upload-text"><strong>点击上传截图</strong><br>支持 JPG、PNG</div>`}
-  </div>`;
+
+  <div class="sec-label">上传付款截图</div>
+  <div class="upload-area ${S.screenshot?'has-file':''}" onclick="document.getElementById('fileInput').click()">
+    <input type="file" id="fileInput" accept="image/*" onchange="onFile(event)">
+    ${S.screenshot
+      ?`<div class="upload-icon">✅</div><div class="upload-text"><strong>截图已上传</strong><br>点击重新选择</div><img src="${S.screenshot}" class="upload-preview">`
+      :`<div class="upload-icon">📸</div><div class="upload-text"><strong>点击上传截图</strong><br>支持 JPG、PNG</div>`}
+  </div>
+  <div class="notice notice-warn" style="margin-top:14px">截图上传后，管理员确认收款即正式生效。预约不可退订，请确认信息无误。</div>`;
 }
 
-function renderStep6() {
-  const amount = state.cardType === 'weekly' ? 40 : 10;
-  const orderId = state.orderId || '—';
-  const dateDisplay = state.cardType === 'weekly'
-    ? `${state.weekDates[0]} ~ ${state.weekDates[4]}`
-    : state.date;
+// ── Step 6: 完成 ──
+function s6(){
+  const amount=S.cardType==='weekly'?40:10;
+  const dateDisp=S.cardType==='weekly'?`${S.weekDates[0]} ~ ${S.weekDates[4]}`:S.date;
   return `
-  <div class="success-screen">
-    <div class="success-icon">🌙</div>
-    <div class="success-title">预约申请已提交</div>
-    <div class="success-sub">管理员确认收款后，预约正式生效<br>请留意工作群通知</div>
+  <div class="success-wrap">
+    <div class="success-anim">🌙</div>
+    <div class="success-title">预约已提交！</div>
+    <div class="success-sub">管理员确认收款后正式生效<br>请留意工作群通知</div>
     <div class="ticket">
-      <div class="ticket-id">订单号 ${orderId}</div>
-      <div class="ticket-row"><span>姓名</span><span>${state.name}</span></div>
-      <div class="ticket-row"><span>工号</span><span>${state.empId}</span></div>
-      <div class="ticket-row"><span>区域 / 床位</span><span>${state.gender==='female'?'女舱':'男舱'} #${state.pod}</span></div>
-      <div class="ticket-row"><span>日期</span><span>${dateDisplay}</span></div>
+      <div class="ticket-id">订单号 ${S.orderId||'—'}</div>
+      <div class="ticket-row"><span>姓名</span><span>${S.name}</span></div>
+      <div class="ticket-row"><span>工号</span><span>${S.empId}</span></div>
+      <div class="ticket-row"><span>区域 / 床位</span><span>${S.gender==='female'?'女舱':'男舱'} #${S.pod}</span></div>
+      <div class="ticket-row"><span>日期</span><span>${dateDisp}</span></div>
       <div class="ticket-row"><span>时段</span><span>12:30–14:00</span></div>
-      <div class="ticket-row"><span>类型</span><span>${state.cardType==='weekly'?'周卡（5天）':'日卡'}</span></div>
+      <div class="ticket-row"><span>类型</span><span>${S.cardType==='weekly'?'周卡（5天）':'日卡'}</span></div>
       <div class="ticket-row"><span>金额</span><span class="ticket-amount">¥${amount}</span></div>
     </div>
-    <div class="pending-notice">⏳ 待管理员确认收款后预约生效，通常在当天上午完成。不支持退订。</div>
-    <button class="btn-restart" onclick="restartBooking()">再预订一次</button>
+    <div class="pending-box">⏳ 床位已为您锁定，待管理员确认收款后预约正式生效。预约不支持退订。</div>
+    <button class="btn-restart" onclick="restart()">再预订一次</button>
   </div>`;
 }
 
-// ============ EVENTS ============
-function selGender(g) { state.gender = g; render(); checkStep1(); }
-function selCardType(ct) { state.cardType = ct; render(); checkStep1(); }
-function checkStep1() { document.getElementById('btnNext').disabled = !(state.gender && state.cardType); }
-function selPod(n) { state.pod = n; render(); document.getElementById('btnNext').disabled = false; }
-
-function selDate(d) {
-  state.date = d;
-  // For daily: time is fixed 12:30–14:00, auto-select
-  state.timeSlot = TIME_SLOT;
+// ── Actions ──
+function pick(key,val){
+  S[key]=val;
+  if(key==='gender'||key==='cardType'){ S.pod=null; S.date=null; S.weekDates=[]; S.bookedPodsOnDate=new Set(); }
   render();
-  document.getElementById('btnNext').disabled = false;
+  setNext(!!(S.gender&&S.cardType));
 }
 
-function selTime() {
-  state.timeSlot = TIME_SLOT;
-  document.getElementById('btnNext').disabled = false;
-}
+function pickPod(n){ S.pod=n; render(); setNext(true); }
 
-function onFormChange() {
-  state.name = document.getElementById('fName').value.trim();
-  state.dept = document.getElementById('fDept').value;
-  state.empId = document.getElementById('fEmpId').value.trim();
-  document.getElementById('btnNext').disabled = !(state.name && state.dept && state.empId);
-}
-
-function onFileSelect(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    state.screenshot = ev.target.result;
-    render();
-    document.getElementById('btnNext').disabled = false;
-  };
-  reader.readAsDataURL(file);
-}
-
-function bindStepEvents() {
-  if (state.step === 4) setTimeout(onFormChange, 50);
-  if (state.step === 3 && state.cardType === 'weekly') {
-    setTimeout(() => { document.getElementById('btnNext').disabled = false; }, 50);
+async function pickDate(d){
+  S.date=d;
+  // ✅ 选日期时立即加载该日期已预约的床位
+  if(S.pod){
+    // date chosen, refresh pod availability for this date
   }
-  if (state.step === 3 && state.cardType === 'daily' && state.date) {
-    setTimeout(() => { document.getElementById('btnNext').disabled = false; }, 50);
-  }
+  await loadBookedPodsForDate(d);
+  render(); setNext(true);
 }
 
-// ============ NAVIGATION ============
-function updateProgressBar() {
-  for (let i = 1; i <= 6; i++) {
-    const el = document.getElementById('ps' + i);
-    if (el) el.className = 'prog-step' + (i === state.step ? ' active' : i < state.step ? ' done' : '');
-  }
+async function loadBookedPodsForDate(date){
+  if(!date)return;
+  const rows=await sb(
+    `bookings?booking_date=eq.${date}&status=in.(pending,confirmed)&gender=eq.${S.gender}&select=pod_number`
+  ).catch(()=>[]);
+  S.bookedPodsOnDate=new Set((rows||[]).map(r=>r.pod_number));
+  // If currently selected pod got booked, deselect it
+  if(S.pod&&S.bookedPodsOnDate.has(S.pod)){ S.pod=null; }
 }
 
-function updateBottomBar() {
-  const back = document.getElementById('btnBack');
-  const next = document.getElementById('btnNext');
-  back.style.display = state.step > 1 && state.step < 6 ? 'block' : 'none';
-  if (state.step === 6) {
-    document.getElementById('bottomBar').style.display = 'none';
-  } else {
-    document.getElementById('bottomBar').style.display = 'block';
-    next.disabled = true;
-    next.textContent = state.step === 5 ? '提交预约' : '下一步';
-    next.className = 'btn-next';
-  }
+function chMonth(d){
+  S.calM+=d;
+  if(S.calM>11){S.calM=0;S.calY++;}
+  if(S.calM<0){S.calM=11;S.calY--;}
+  document.getElementById('app').innerHTML=s3();
+  afterRender();
 }
 
-function goBack() { if (state.step > 1) { state.step--; render(); } }
+function checkForm(){
+  S.name=document.getElementById('fName')?.value.trim()||S.name;
+  S.dept=document.getElementById('fDept')?.value||S.dept;
+  S.empId=document.getElementById('fEmpId')?.value.trim()||S.empId;
+  setNext(!!(S.name&&S.dept&&S.empId));
+}
 
-async function goNext() {
-  if (state.step === 1) {
-    state.step = 2; await loadPodsData(); render();
-    document.getElementById('btnNext').disabled = !state.pod;
-  } else if (state.step === 2) {
-    state.step = 3; render();
-    document.getElementById('btnNext').disabled = true;
-  } else if (state.step === 3) {
-    state.step = 4; render();
-  } else if (state.step === 4) {
-    saveUserInfo(state.name, state.dept, state.empId);
-    state.step = 5; render();
-    document.getElementById('btnNext').disabled = !state.screenshot;
-  } else if (state.step === 5) {
-    await submitBooking();
+function onFile(e){
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{S.screenshot=ev.target.result;render();setNext(true);};
+  r.readAsDataURL(f);
+}
+
+// ── Navigation ──
+function goBack(){ if(S.step>1){S.step--;render();} }
+
+async function goNext(){
+  if(S.step===1){
+    S.step=2;
+    document.getElementById('app').innerHTML='<div class="loading-dots">加载床位中 <span class="dot">•</span><span class="dot">•</span><span class="dot">•</span></div>';
+    await loadBase();
+    // ✅ 如果已经选了日期（如重新进入），预加载已预约床位
+    if(S.date) await loadBookedPodsForDate(S.date);
+    render(); setNext(!!S.pod);
+  } else if(S.step===2){
+    S.step=3; render(); setNext(S.cardType==='weekly'||(S.date!=null));
+  } else if(S.step===3){
+    S.step=4; render();
+  } else if(S.step===4){
+    saveUser(S.name,S.dept,S.empId);
+    S.step=5; render(); setNext(!!S.screenshot);
+  } else if(S.step===5){
+    await submit();
   }
 }
 
-async function loadPodsData() {
-  try {
-    state.allPods = await loadPods() || [];
-    state.blockedDates = await loadBlockedDates() || [];
-  } catch(e) { showToast('加载失败，请刷新重试'); }
-}
-
-async function submitBooking() {
-  const btn = document.getElementById('btnNext');
-  btn.disabled = true; btn.textContent = '提交中...';
-  try {
-    const podObj = state.allPods.find(p => p.gender === state.gender && p.pod_number === state.pod);
-    const amount = state.cardType === 'weekly' ? 40 : 10;
-    const booking = {
-      pod_id: podObj?.id, gender: state.gender, pod_number: state.pod,
-      card_type: state.cardType,
-      booking_date: state.date,
-      // 周卡存为 "2025-06-16~2025-06-20" 格式
-      time_slot: TIME_SLOT,
-      name: state.name, department: state.dept, employee_id: state.empId,
-      status: 'pending', is_free: false, payment_amount: amount,
-      payment_screenshot: state.screenshot ? '已上传' : null
-    };
-    // 周卡：把整周日期范围存入 booking_date 字段（用 weekDates[0]）
-    if (state.cardType === 'weekly' && state.weekDates.length > 0) {
-      booking.booking_date = state.weekDates[0]; // 周一日期
-    }
-    const result = await createBooking(booking);
-    state.orderId = result?.[0]?.id || 'N/A';
-    state.step = 6; render();
-  } catch(e) {
-    btn.disabled = false; btn.textContent = '提交预约';
-    showToast('提交失败：' + (e.message || '请重试'));
+async function submit(){
+  const btn=document.getElementById('btnNext');
+  btn.disabled=true; btn.textContent='提交中…';
+  try{
+    const pod=S.allPods.find(p=>p.gender===S.gender&&p.pod_number===S.pod);
+    const amount=S.cardType==='weekly'?40:10;
+    const dateToSave=S.cardType==='weekly'?S.weekDates[0]:S.date;
+    const res=await sb('bookings',{
+      method:'POST', prefer:'return=representation',
+      body:JSON.stringify({
+        pod_id:pod?.id, gender:S.gender, pod_number:S.pod,
+        card_type:S.cardType, booking_date:dateToSave, time_slot:TIME_SLOT,
+        name:S.name, department:S.dept, employee_id:S.empId,
+        status:'pending', is_free:false, payment_amount:amount,
+        payment_screenshot:S.screenshot?'已上传':null
+      })
+    });
+    S.orderId=res?.[0]?.id||'N/A';
+    S.step=6; render();
+  }catch(e){
+    btn.disabled=false; btn.textContent='确认预约';
+    toast('提交失败，请重试');
   }
 }
 
-function restartBooking() {
-  state = { step:1, gender:null, cardType:null, pod:null, date:null, weekDates:[],
-    name:'', dept:'', empId:'', screenshot:null,
-    allPods:state.allPods, blockedDates:state.blockedDates, takenSlots:[],
-    calYear:new Date().getFullYear(), calMonth:new Date().getMonth() };
-  document.getElementById('bottomBar').style.display = 'block';
+function restart(){
+  const base={allPods:S.allPods,blockedDates:S.blockedDates};
+  S={step:1,gender:null,cardType:null,pod:null,date:null,weekDates:[],
+    name:'',dept:'',empId:'',screenshot:null,orderId:null,
+    bookedPodsOnDate:new Set(),calY:new Date().getFullYear(),calM:new Date().getMonth(),...base};
+  document.getElementById('bottomBar').style.display='block';
   render();
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
 render();
