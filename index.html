@@ -3,414 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>午休舱预订</title>
+<title>睡眠舱预订</title>
 <style>
 :root {
-  --bg: #1a2a3a;
-  --bg2: #243447;
-  --bg3: #2e4060;
-  --card: rgba(255,255,255,0.07);
-  --card-border: rgba(255,255,255,0.12);
-  --card-selected: rgba(255,255,255,0.18);
-  --accent: #7EC8C8;
-  --accent2: #5BA8A8;
-  --accent-soft: rgba(126,200,200,0.15);
-  --gold: #E8C97A;
-  --gold-soft: rgba(232,201,122,0.15);
-  --danger: #E87A7A;
-  --danger-soft: rgba(232,122,122,0.12);
-  --text: #F0F4F8;
-  --text2: rgba(240,244,248,0.65);
-  --text3: rgba(240,244,248,0.38);
-  --border: rgba(255,255,255,0.10);
-  --r: 16px;
-  --r-sm: 10px;
-  --r-xs: 8px;
+  --bg: #1a2a3a; --bg2: #243447; --bg3: #2e4060;
+  --card: rgba(255,255,255,0.07); --card-border: rgba(255,255,255,0.12);
+  --accent: #7EC8C8; --accent2: #5BA8A8; --accent-soft: rgba(126,200,200,0.15);
+  --gold: #E8C97A; --gold-soft: rgba(232,201,122,0.15);
+  --danger: #E87A7A; --danger-soft: rgba(232,122,122,0.12);
+  --text: #F0F4F8; --text2: rgba(240,244,248,0.65); --text3: rgba(240,244,248,0.38);
+  --border: rgba(255,255,255,0.10); --r: 16px; --r-sm: 10px; --r-xs: 8px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; }
-body {
-  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
-  background: linear-gradient(160deg, #1a2a3a 0%, #1e3a4a 40%, #1a3040 100%);
-  min-height: 100vh;
-  color: var(--text);
-}
+body { font-family: -apple-system,'PingFang SC','Helvetica Neue',sans-serif; background: linear-gradient(160deg,#1a2a3a 0%,#1e3a4a 40%,#1a3040 100%); min-height:100vh; color:var(--text); }
 
-/* ── Header ── */
-.header {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(26,42,58,0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 20px;
-  safe-area-inset-top: env(safe-area-inset-top);
-}
-.header-inner {
-  max-width: 520px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 56px;
-}
-.header-logo { display: flex; align-items: center; gap: 8px; }
-.header-logo span { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
-.header-tag {
-  font-size: 11px; color: var(--accent);
-  background: var(--accent-soft);
-  padding: 3px 9px; border-radius: 20px; font-weight: 500;
-}
+.header { position:sticky; top:0; z-index:100; background:rgba(26,42,58,0.92); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:0 20px; }
+.header-inner { max-width:520px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:56px; }
+.header-logo span { font-size:18px; font-weight:700; letter-spacing:-0.5px; }
+.header-tag { font-size:11px; color:var(--accent); background:var(--accent-soft); padding:3px 9px; border-radius:20px; font-weight:500; white-space:nowrap; }
 
-/* ── Progress ── */
-.progress-bar {
-  background: rgba(26,42,58,0.7);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 20px;
-}
-.progress-inner { max-width: 520px; margin: 0 auto; display: flex; }
-.prog-step {
-  flex: 1; padding: 10px 0; text-align: center;
-  font-size: 10px; color: var(--text3);
-  border-bottom: 2px solid transparent; transition: all 0.25s;
-}
-.prog-step.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
-.prog-step.done { color: var(--text3); border-bottom-color: rgba(126,200,200,0.3); }
+.progress-bar { background:rgba(26,42,58,0.7); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); padding:0 20px; }
+.progress-inner { max-width:520px; margin:0 auto; display:flex; }
+.prog-step { flex:1; padding:10px 0; text-align:center; font-size:10px; color:var(--text3); border-bottom:2px solid transparent; transition:all 0.25s; }
+.prog-step.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:600; }
+.prog-step.done { color:var(--text3); border-bottom-color:rgba(126,200,200,0.3); }
 
-/* ── Content ── */
-.content { max-width: 520px; margin: 0 auto; padding: 24px 16px 120px; }
+.content { max-width:520px; margin:0 auto; padding:24px 16px 120px; }
+.sec-label { font-size:11px; font-weight:600; letter-spacing:1px; color:var(--text3); text-transform:uppercase; margin-bottom:10px; margin-top:28px; }
+.sec-label:first-child { margin-top:0; }
 
-/* ── Section label ── */
-.sec-label {
-  font-size: 11px; font-weight: 600; letter-spacing: 1px;
-  color: var(--text3); text-transform: uppercase;
-  margin-bottom: 10px; margin-top: 28px;
-}
-.sec-label:first-child { margin-top: 0; }
+.intro-banner { background:linear-gradient(135deg,rgba(126,200,200,0.18),rgba(91,168,168,0.08)); border:1px solid rgba(126,200,200,0.2); border-radius:var(--r); padding:24px 20px; margin-bottom:24px; text-align:center; }
+.intro-icon { font-size:48px; margin-bottom:10px; line-height:1; }
+.intro-title { font-size:20px; font-weight:700; color:var(--text); margin-bottom:6px; }
+.intro-sub { font-size:13px; color:var(--text2); line-height:1.7; }
 
-/* ── Intro banner ── */
-.intro-banner {
-  background: linear-gradient(135deg, rgba(126,200,200,0.18), rgba(91,168,168,0.08));
-  border: 1px solid rgba(126,200,200,0.2);
-  border-radius: var(--r);
-  padding: 20px;
-  margin-bottom: 24px;
-  text-align: center;
-}
-.intro-moon { font-size: 36px; margin-bottom: 8px; }
-.intro-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.intro-sub { font-size: 13px; color: var(--text2); line-height: 1.6; }
+/* Gender cards with SVG illustrations */
+.card-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.card-opt { background:var(--card); border:1.5px solid var(--card-border); border-radius:var(--r); padding:18px 14px; cursor:pointer; transition:all 0.2s; position:relative; overflow:hidden; }
+.card-opt:active { transform:scale(0.97); }
+.card-opt.selected { border-color:var(--accent); background:var(--accent-soft); }
+.card-opt.unavail { opacity:0.35; cursor:not-allowed; }
+.card-opt.unavail:active { transform:none; }
+.card-illus { width:100%; height:70px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+.card-name { font-size:15px; font-weight:700; color:var(--text); margin-bottom:4px; }
+.card-desc { font-size:12px; color:var(--text2); line-height:1.55; }
+.card-price { font-size:20px; font-weight:800; color:var(--accent); margin-top:10px; letter-spacing:-0.5px; }
+.card-price small { font-size:12px; font-weight:400; color:var(--text3); }
+.card-pill { display:inline-block; font-size:10px; font-weight:600; padding:3px 8px; border-radius:20px; margin-top:6px; }
+.pill-open { background:rgba(126,200,200,0.18); color:var(--accent); }
+.pill-closed { background:rgba(240,244,248,0.08); color:var(--text3); }
+.pill-gold { background:var(--gold-soft); color:var(--gold); }
+.checkmark { position:absolute; top:12px; right:12px; width:20px; height:20px; border-radius:50%; background:var(--accent); display:none; align-items:center; justify-content:center; font-size:10px; color:#1a2a3a; }
+.card-opt.selected .checkmark { display:flex; }
 
-/* ── Card grid ── */
-.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.card-opt {
-  background: var(--card); border: 1.5px solid var(--card-border);
-  border-radius: var(--r); padding: 18px 14px;
-  cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
-}
-.card-opt::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(126,200,200,0.0), rgba(126,200,200,0.0));
-  transition: all 0.2s;
-}
-.card-opt:active { transform: scale(0.97); }
-.card-opt.selected {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-.card-opt.selected::before {
-  background: linear-gradient(135deg, rgba(126,200,200,0.08), transparent);
-}
-.card-opt.unavail { opacity: 0.35; cursor: not-allowed; }
-.card-opt.unavail:active { transform: none; }
-.card-emoji { font-size: 26px; margin-bottom: 10px; }
-.card-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.card-desc { font-size: 12px; color: var(--text2); line-height: 1.55; }
-.card-price {
-  font-size: 20px; font-weight: 800; color: var(--accent);
-  margin-top: 10px; letter-spacing: -0.5px;
-}
-.card-price small { font-size: 12px; font-weight: 400; color: var(--text3); }
-.card-pill {
-  display: inline-block; font-size: 10px; font-weight: 600;
-  padding: 3px 8px; border-radius: 20px; margin-top: 6px;
-}
-.pill-open { background: rgba(126,200,200,0.18); color: var(--accent); }
-.pill-closed { background: rgba(240,244,248,0.08); color: var(--text3); }
-.pill-gold { background: var(--gold-soft); color: var(--gold); }
-.checkmark {
-  position: absolute; top: 12px; right: 12px;
-  width: 20px; height: 20px; border-radius: 50%;
-  background: var(--accent); display: none;
-  align-items: center; justify-content: center; font-size: 10px;
-}
-.card-opt.selected .checkmark { display: flex; }
+/* Pod grid */
+.pods-section { background:var(--card); border:1px solid var(--card-border); border-radius:var(--r); padding:16px; }
+.pods-legend { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.leg { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text3); }
+.leg-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+.pods-grid { display:grid; gap:5px; }
+.pods-grid.female { grid-template-columns:repeat(8,1fr); }
+.pods-grid.male { grid-template-columns:repeat(8,1fr); }
+.pod { aspect-ratio:1; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.15s; border:1.5px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:var(--text2); }
+.pod.weekly-type { border-style:dashed; border-color:rgba(126,200,200,0.4); }
+.pod:active:not(.pod-occ):not(.pod-locked) { transform:scale(0.92); }
+.pod.pod-sel { background:var(--accent); border-color:var(--accent); color:#1a2a3a; font-weight:700; border-style:solid; }
+.pod.pod-occ { background:rgba(255,255,255,0.03); color:var(--text3); cursor:not-allowed; border-color:rgba(255,255,255,0.06); position:relative; }
+.pod.pod-occ::after { content:''; position:absolute; inset:3px; background:repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255,255,255,0.08) 2px,rgba(255,255,255,0.08) 4px); border-radius:3px; }
+.pod.pod-locked { opacity:0.2; cursor:not-allowed; }
 
-/* ── Pod grid ── */
-.pods-section { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--r); padding: 16px; }
-.pods-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
-.leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text3); }
-.leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-.pods-grid { display: grid; gap: 5px; }
-.pods-grid.female { grid-template-columns: repeat(8, 1fr); }
-.pods-grid.male { grid-template-columns: repeat(8, 1fr); }
-@media (max-width: 400px) {
-  .pods-grid.female { grid-template-columns: repeat(8, 1fr); gap: 3px; }
-  .pods-grid.male { grid-template-columns: repeat(8, 1fr); gap: 3px; }
-}
-.pod {
-  aspect-ratio: 1; border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 600; cursor: pointer;
-  transition: all 0.15s;
-  border: 1.5px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06); color: var(--text2);
-}
-.pod.weekly-type { border-style: dashed; border-color: rgba(126,200,200,0.4); }
-.pod:active:not(.pod-occ):not(.pod-locked) { transform: scale(0.92); }
-.pod.pod-sel {
-  background: var(--accent); border-color: var(--accent);
-  color: #1a2a3a; font-weight: 700; border-style: solid;
-}
-.pod.pod-occ {
-  background: rgba(255,255,255,0.03); color: var(--text3);
-  cursor: not-allowed; border-color: rgba(255,255,255,0.06);
-  position: relative;
-}
-.pod.pod-occ::after {
-  content: ''; position: absolute; inset: 3px;
-  background: repeating-linear-gradient(
-    45deg, transparent, transparent 2px,
-    rgba(255,255,255,0.06) 2px, rgba(255,255,255,0.06) 4px
-  );
-  border-radius: 3px;
-}
-.pod.pod-locked { opacity: 0.2; cursor: not-allowed; }
+/* Calendar */
+.cal-wrap { background:var(--card); border:1px solid var(--card-border); border-radius:var(--r); overflow:hidden; margin-bottom:16px; }
+.cal-head { padding:16px; display:flex; align-items:center; justify-content:space-between; background:rgba(126,200,200,0.08); }
+.cal-month { font-size:16px; font-weight:700; color:var(--text); }
+.cal-nav { background:rgba(255,255,255,0.1); border:none; color:var(--text); width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:background 0.15s; }
+.cal-nav:active { background:rgba(255,255,255,0.2); }
+.cal-dow { display:grid; grid-template-columns:repeat(7,1fr); }
+.cal-dow-cell { text-align:center; padding:8px 0; font-size:10px; color:var(--text3); font-weight:600; letter-spacing:0.3px; }
+.cal-dow-cell.we { color:rgba(232,201,122,0.6); }
+.cal-days { display:grid; grid-template-columns:repeat(7,1fr); padding:8px; gap:3px; }
+.cal-d { aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:13px; cursor:pointer; transition:all 0.15s; color:var(--text2); font-weight:500; }
+.cal-d:active:not(.cal-dis):not(.cal-empty) { transform:scale(0.88); }
+.cal-d.cal-today { color:var(--accent); font-weight:700; }
+.cal-d.cal-sel { background:var(--accent); color:#1a2a3a; font-weight:700; }
+.cal-d.cal-dis { color:var(--text3); cursor:not-allowed; opacity:0.4; }
+.cal-d.cal-we { color:rgba(232,201,122,0.7); }
+.cal-d.cal-we.cal-sel { color:#1a2a3a; }
+.cal-d.cal-empty { cursor:default; }
+.cal-d.cal-blocked { color:var(--danger); opacity:0.4; cursor:not-allowed; text-decoration:line-through; }
 
-/* ── Calendar ── */
-.cal-wrap {
-  background: var(--card); border: 1px solid var(--card-border);
-  border-radius: var(--r); overflow: hidden; margin-bottom: 16px;
-}
-.cal-head {
-  padding: 16px; display: flex; align-items: center; justify-content: space-between;
-  background: rgba(126,200,200,0.08);
-}
-.cal-month { font-size: 16px; font-weight: 700; color: var(--text); }
-.cal-nav {
-  background: rgba(255,255,255,0.1); border: none; color: var(--text);
-  width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
-  font-size: 16px; display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
-}
-.cal-nav:active { background: rgba(255,255,255,0.2); }
-.cal-dow { display: grid; grid-template-columns: repeat(7,1fr); }
-.cal-dow-cell {
-  text-align: center; padding: 8px 0;
-  font-size: 10px; color: var(--text3); font-weight: 600; letter-spacing: 0.3px;
-}
-.cal-dow-cell.we { color: rgba(232,201,122,0.6); }
-.cal-days { display: grid; grid-template-columns: repeat(7,1fr); padding: 8px; gap: 3px; }
-.cal-d {
-  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-  border-radius: 8px; font-size: 13px; cursor: pointer;
-  transition: all 0.15s; color: var(--text2); font-weight: 500;
-}
-.cal-d:active:not(.cal-dis):not(.cal-empty) { transform: scale(0.88); }
-.cal-d.cal-today { color: var(--accent); font-weight: 700; }
-.cal-d.cal-sel { background: var(--accent); color: #1a2a3a; font-weight: 700; }
-.cal-d.cal-dis { color: var(--text3); cursor: not-allowed; opacity: 0.4; }
-.cal-d.cal-we { color: rgba(232,201,122,0.7); }
-.cal-d.cal-we.cal-sel { color: #1a2a3a; }
-.cal-d.cal-empty { cursor: default; }
-.cal-d.cal-blocked { color: var(--danger); opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+/* Time slot */
+.time-slot-btn { background:var(--card); border:1.5px solid var(--card-border); border-radius:var(--r); padding:20px; text-align:center; transition:all 0.2s; }
+.time-slot-btn.sel { border-color:var(--accent); background:var(--accent-soft); }
+.time-slot-time { font-size:22px; font-weight:800; color:var(--text); letter-spacing:-0.5px; }
+.time-slot-sub { font-size:12px; color:var(--text2); margin-top:5px; }
 
-/* ── Time slot ── */
-.time-slot-btn {
-  background: var(--card); border: 1.5px solid var(--card-border);
-  border-radius: var(--r); padding: 20px;
-  text-align: center; cursor: pointer; transition: all 0.2s;
-}
-.time-slot-btn.sel {
-  border-color: var(--accent); background: var(--accent-soft);
-}
-.time-slot-btn.full {
-  opacity: 0.4; cursor: not-allowed;
-  border-color: var(--danger); background: var(--danger-soft);
-}
-.time-slot-time { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
-.time-slot-sub { font-size: 12px; color: var(--text2); margin-top: 5px; }
+/* Weekly */
+.week-preview { background:var(--card); border:1px solid var(--card-border); border-radius:var(--r); padding:16px; margin-bottom:14px; }
+.week-preview-label { font-size:11px; color:var(--text3); margin-bottom:10px; font-weight:600; letter-spacing:0.5px; }
+.week-dates { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+.week-date-cell { background:var(--accent-soft); border:1px solid rgba(126,200,200,0.2); border-radius:var(--r-xs); padding:8px 4px; text-align:center; }
+.week-date-dow { font-size:10px; color:var(--accent); font-weight:600; margin-bottom:3px; }
+.week-date-num { font-size:13px; color:var(--text); font-weight:700; }
 
-/* ── Weekly dates ── */
-.week-preview {
-  background: var(--card); border: 1px solid var(--card-border);
-  border-radius: var(--r); padding: 16px; margin-bottom: 14px;
-}
-.week-preview-label { font-size: 11px; color: var(--text3); margin-bottom: 10px; font-weight: 600; letter-spacing: 0.5px; }
-.week-dates { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
-.week-date-cell {
-  background: var(--accent-soft); border: 1px solid rgba(126,200,200,0.2);
-  border-radius: var(--r-xs); padding: 8px 4px; text-align: center;
-}
-.week-date-dow { font-size: 10px; color: var(--accent); font-weight: 600; margin-bottom: 3px; }
-.week-date-num { font-size: 13px; color: var(--text); font-weight: 700; }
+/* Form */
+.form-group { margin-bottom:14px; }
+.form-label { font-size:12px; color:var(--text3); margin-bottom:7px; display:block; font-weight:600; letter-spacing:0.3px; }
+.form-input { width:100%; background:var(--card); border:1.5px solid var(--card-border); border-radius:var(--r-sm); padding:13px 16px; font-size:16px; color:var(--text); outline:none; transition:border-color 0.15s; -webkit-appearance:none; caret-color:var(--accent); }
+.form-input:focus { border-color:var(--accent); }
+.form-input::placeholder { color:var(--text3); }
+select.form-input { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(240,244,248,0.4)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; padding-right:40px; }
+select.form-input option { background:#243447; color:var(--text); }
 
-/* ── Form ── */
-.form-group { margin-bottom: 14px; }
-.form-label { font-size: 12px; color: var(--text3); margin-bottom: 7px; display: block; font-weight: 600; letter-spacing: 0.3px; }
-.form-input {
-  width: 100%; background: var(--card); border: 1.5px solid var(--card-border);
-  border-radius: var(--r-sm); padding: 13px 16px;
-  font-size: 16px; color: var(--text); outline: none;
-  transition: border-color 0.15s; -webkit-appearance: none;
-  caret-color: var(--accent);
-}
-.form-input:focus { border-color: var(--accent); }
-.form-input::placeholder { color: var(--text3); }
-select.form-input {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(240,244,248,0.4)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px;
-}
-select.form-input option { background: #243447; color: var(--text); }
+/* Summary */
+.summary { background:var(--card); border:1px solid var(--card-border); border-radius:var(--r); padding:16px; margin:16px 0; }
+.sum-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; }
+.sum-row+.sum-row { border-top:1px solid rgba(255,255,255,0.06); }
+.sum-label { font-size:13px; color:var(--text3); }
+.sum-val { font-size:13px; color:var(--text2); font-weight:500; text-align:right; }
+.sum-row.total .sum-label { font-size:15px; font-weight:700; color:var(--text); }
+.sum-row.total .sum-val { font-size:20px; font-weight:800; color:var(--accent); }
 
-/* ── Summary box ── */
-.summary {
-  background: var(--card); border: 1px solid var(--card-border);
-  border-radius: var(--r); padding: 16px; margin: 16px 0;
-}
-.sum-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; }
-.sum-row + .sum-row { border-top: 1px solid rgba(255,255,255,0.06); }
-.sum-label { font-size: 13px; color: var(--text3); }
-.sum-val { font-size: 13px; color: var(--text2); font-weight: 500; text-align: right; }
-.sum-row.total .sum-label { font-size: 15px; font-weight: 700; color: var(--text); }
-.sum-row.total .sum-val { font-size: 20px; font-weight: 800; color: var(--accent); }
+/* Pay */
+.pay-box { background:var(--card); border:1px solid var(--card-border); border-radius:var(--r); padding:24px 20px; text-align:center; margin-bottom:20px; }
+.pay-tag { font-size:12px; color:var(--text3); margin-bottom:4px; }
+.pay-amount { font-size:44px; font-weight:900; color:var(--accent); letter-spacing:-1px; line-height:1; margin-bottom:4px; }
+.pay-amount-sub { font-size:12px; color:var(--text3); margin-bottom:20px; }
+.pay-qr-wrap { width:180px; height:180px; margin:0 auto 16px; border-radius:12px; overflow:hidden; border:1px solid var(--border); background:white; display:flex; align-items:center; justify-content:center; }
+.pay-qr-wrap img { width:100%; height:100%; object-fit:contain; }
+.pay-qr-placeholder { width:100%; height:100%; background:rgba(255,255,255,0.04); display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; color:var(--text3); gap:6px; line-height:1.5; text-align:center; }
+.pay-methods { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.pay-method { font-size:11px; color:var(--text3); background:rgba(255,255,255,0.06); padding:4px 10px; border-radius:20px; }
+.pay-note { font-size:12px; color:var(--text3); line-height:1.7; }
+.pay-note strong { color:var(--accent); }
 
-/* ── Pay box ── */
-.pay-box {
-  background: var(--card); border: 1px solid var(--card-border);
-  border-radius: var(--r); padding: 24px 20px; text-align: center; margin-bottom: 20px;
-}
-.pay-tag { font-size: 12px; color: var(--text3); margin-bottom: 4px; }
-.pay-amount { font-size: 44px; font-weight: 900; color: var(--accent); letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
-.pay-amount-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
-.pay-qr-wrap { width: 160px; height: 160px; margin: 0 auto 16px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-.pay-qr-placeholder {
-  width: 100%; height: 100%; background: rgba(255,255,255,0.04);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-size: 11px; color: var(--text3); gap: 6px; line-height: 1.5; text-align: center;
-}
-.pay-methods { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.pay-method { font-size: 11px; color: var(--text3); background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 20px; }
-.pay-note { font-size: 12px; color: var(--text3); line-height: 1.7; }
-.pay-note strong { color: var(--accent); }
+/* Upload */
+.upload-area { border:2px dashed rgba(255,255,255,0.15); border-radius:var(--r); padding:28px 20px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--card); }
+.upload-area:active { transform:scale(0.98); }
+.upload-area.has-file { border-color:var(--accent); background:var(--accent-soft); }
+.upload-icon { font-size:32px; margin-bottom:8px; }
+.upload-text { font-size:13px; color:var(--text3); }
+.upload-text strong { color:var(--text2); }
+#fileInput { display:none; }
+.upload-preview { max-width:100%; max-height:180px; border-radius:10px; margin-top:14px; display:block; margin-left:auto; margin-right:auto; }
 
-/* ── Upload ── */
-.upload-area {
-  border: 2px dashed rgba(255,255,255,0.15); border-radius: var(--r);
-  padding: 28px 20px; text-align: center; cursor: pointer;
-  transition: all 0.2s; background: var(--card);
-}
-.upload-area:active { transform: scale(0.98); }
-.upload-area.has-file { border-color: var(--accent); background: var(--accent-soft); }
-.upload-icon { font-size: 32px; margin-bottom: 8px; }
-.upload-text { font-size: 13px; color: var(--text3); }
-.upload-text strong { color: var(--text2); }
-#fileInput { display: none; }
-.upload-preview { max-width: 100%; max-height: 180px; border-radius: 10px; margin-top: 14px; }
+/* Notice */
+.notice { border-radius:var(--r-sm); padding:11px 14px; font-size:12px; line-height:1.6; margin-bottom:14px; }
+.notice-info { background:var(--accent-soft); color:var(--accent); border:1px solid rgba(126,200,200,0.2); }
+.notice-warn { background:var(--gold-soft); color:var(--gold); border:1px solid rgba(232,201,122,0.2); }
 
-/* ── Notice ── */
-.notice {
-  border-radius: var(--r-sm); padding: 11px 14px;
-  font-size: 12px; line-height: 1.6; margin-bottom: 14px;
-}
-.notice-info { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(126,200,200,0.2); }
-.notice-warn { background: var(--gold-soft); color: var(--gold); border: 1px solid rgba(232,201,122,0.2); }
+/* Bottom */
+.bottom-bar { position:fixed; bottom:0; left:0; right:0; background:rgba(26,42,58,0.95); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid var(--border); padding:12px 20px; padding-bottom:calc(12px + env(safe-area-inset-bottom)); z-index:100; }
+.bottom-inner { max-width:520px; margin:0 auto; display:flex; gap:10px; }
+.btn-back { background:rgba(255,255,255,0.08); color:var(--text2); border:none; border-radius:var(--r-sm); padding:14px 20px; font-size:15px; font-weight:600; cursor:pointer; flex-shrink:0; transition:background 0.15s; }
+.btn-back:active { background:rgba(255,255,255,0.14); }
+.btn-next { flex:1; background:var(--accent); color:#1a2a3a; border:none; border-radius:var(--r-sm); padding:15px; font-size:16px; font-weight:800; cursor:pointer; transition:all 0.15s; letter-spacing:-0.3px; }
+.btn-next:active:not(:disabled) { transform:scale(0.97); background:var(--accent2); }
+.btn-next:disabled { background:rgba(255,255,255,0.1); color:var(--text3); cursor:not-allowed; }
 
-/* ── Bottom bar ── */
-.bottom-bar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(26,42,58,0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid var(--border);
-  padding: 12px 20px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom));
-  z-index: 100;
-}
-.bottom-inner { max-width: 520px; margin: 0 auto; display: flex; gap: 10px; }
-.btn-back {
-  background: rgba(255,255,255,0.08); color: var(--text2);
-  border: none; border-radius: var(--r-sm); padding: 14px 20px;
-  font-size: 15px; font-weight: 600; cursor: pointer; flex-shrink: 0;
-  transition: background 0.15s;
-}
-.btn-back:active { background: rgba(255,255,255,0.14); }
-.btn-next {
-  flex: 1; background: var(--accent); color: #1a2a3a;
-  border: none; border-radius: var(--r-sm); padding: 15px;
-  font-size: 16px; font-weight: 800; cursor: pointer;
-  transition: all 0.15s; letter-spacing: -0.3px;
-}
-.btn-next:active:not(:disabled) { transform: scale(0.97); background: var(--accent2); }
-.btn-next:disabled { background: rgba(255,255,255,0.1); color: var(--text3); cursor: not-allowed; }
+/* Success */
+.success-wrap { text-align:center; padding:20px 0 40px; }
+.success-anim { font-size:56px; margin-bottom:16px; animation:pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes pop { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+.success-title { font-size:24px; font-weight:800; color:var(--text); margin-bottom:8px; }
+.success-sub { font-size:14px; color:var(--text2); line-height:1.7; margin-bottom:28px; }
+.ticket { background:var(--card); border:1px solid var(--card-border); border-radius:var(--r); padding:20px; text-align:left; max-width:340px; margin:0 auto 20px; position:relative; overflow:hidden; }
+.ticket::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--gold)); }
+.ticket-id { font-size:10px; color:var(--text3); margin-bottom:14px; font-family:monospace; }
+.ticket-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; }
+.ticket-row+.ticket-row { border-top:1px solid rgba(255,255,255,0.06); }
+.ticket-row span:first-child { font-size:12px; color:var(--text3); }
+.ticket-row span:last-child { font-size:13px; font-weight:600; color:var(--text); }
+.ticket-amount { font-size:22px; font-weight:900; color:var(--accent); }
+.pending-box { background:var(--gold-soft); border:1px solid rgba(232,201,122,0.2); border-radius:var(--r-sm); padding:12px 14px; font-size:12px; color:var(--gold); line-height:1.7; max-width:340px; margin:0 auto 24px; text-align:left; }
+.btn-restart { background:rgba(255,255,255,0.08); color:var(--text2); border:none; border-radius:var(--r-sm); padding:12px 28px; font-size:14px; font-weight:600; cursor:pointer; }
 
-/* ── Success ── */
-.success-wrap { text-align: center; padding: 20px 0 40px; }
-.success-anim { font-size: 56px; margin-bottom: 16px; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
-@keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.success-title { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
-.success-sub { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 28px; }
-.ticket {
-  background: var(--card); border: 1px solid var(--card-border);
-  border-radius: var(--r); padding: 20px; text-align: left;
-  max-width: 340px; margin: 0 auto 20px; position: relative; overflow: hidden;
-}
-.ticket::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--gold));
-}
-.ticket-id { font-size: 10px; color: var(--text3); margin-bottom: 14px; font-family: monospace; }
-.ticket-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
-.ticket-row + .ticket-row { border-top: 1px solid rgba(255,255,255,0.06); }
-.ticket-row span:first-child { font-size: 12px; color: var(--text3); }
-.ticket-row span:last-child { font-size: 13px; font-weight: 600; color: var(--text); }
-.ticket-amount { font-size: 22px; font-weight: 900; color: var(--accent); }
-.pending-box {
-  background: var(--gold-soft); border: 1px solid rgba(232,201,122,0.2);
-  border-radius: var(--r-sm); padding: 12px 14px;
-  font-size: 12px; color: var(--gold); line-height: 1.7;
-  max-width: 340px; margin: 0 auto 24px; text-align: left;
-}
-.btn-restart {
-  background: rgba(255,255,255,0.08); color: var(--text2);
-  border: none; border-radius: var(--r-sm); padding: 12px 28px;
-  font-size: 14px; font-weight: 600; cursor: pointer;
-}
+.loading-dots { text-align:center; padding:30px; color:var(--text3); font-size:13px; }
+.dot { display:inline-block; animation:blink 1.4s infinite; }
+.dot:nth-child(2){animation-delay:0.2s} .dot:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0.2}40%{opacity:1}}
 
-/* ── Loading ── */
-.loading-dots { text-align: center; padding: 30px; color: var(--text3); font-size: 13px; }
-.dot { display: inline-block; animation: blink 1.4s infinite; }
-.dot:nth-child(2) { animation-delay: 0.2s; }
-.dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+.toast { position:fixed; top:70px; left:50%; transform:translateX(-50%); background:rgba(26,42,58,0.95); border:1px solid var(--border); color:var(--text); padding:10px 20px; border-radius:24px; font-size:13px; z-index:999; opacity:0; transition:opacity 0.2s; pointer-events:none; white-space:nowrap; backdrop-filter:blur(10px); }
+.toast.show { opacity:1; }
 
-/* ── Toast ── */
-.toast {
-  position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
-  background: rgba(26,42,58,0.95); border: 1px solid var(--border);
-  color: var(--text); padding: 10px 20px; border-radius: 24px;
-  font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.2s;
-  pointer-events: none; white-space: nowrap; backdrop-filter: blur(10px);
-}
-.toast.show { opacity: 1; }
-
-/* ── Mobile tweaks ── */
-@media (max-width: 360px) {
-  .card-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .card-opt { padding: 14px 10px; }
-  .card-name { font-size: 14px; }
-  .card-price { font-size: 17px; }
-  .pod { font-size: 10px; }
-  .content { padding: 16px 12px 110px; }
+@media (max-width:360px) {
+  .card-opt{padding:14px 10px} .card-name{font-size:14px} .card-price{font-size:17px}
+  .pod{font-size:10px} .content{padding:16px 12px 110px}
 }
 </style>
 </head>
@@ -418,10 +197,9 @@ select.form-input option { background: #243447; color: var(--text); }
 
 <div class="header">
   <div class="header-inner">
-    <div class="header-logo">
-      <span>🌙 午休舱</span>
-    </div>
-    <span class="header-tag">12:30–14:00</span>
+    <div class="header-logo"><span>🌙 睡眠舱</span></div>
+    <!-- ✅ Fix 2: 右上角显示工作日 + 开放时间 -->
+    <span class="header-tag">工作日 12:30–14:00</span>
   </div>
 </div>
 
@@ -444,31 +222,52 @@ select.form-input option { background: #243447; color: var(--text); }
     <button class="btn-next" id="btnNext" disabled onclick="goNext()">下一步</button>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Config ──
 const SUPABASE_URL = 'https://fbnofibcfpdcrhuaqvgh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_jmaLdj9S1t06j-1F_dhl8Q_36cO36xc';
-const QR_CODE_URL  = 'YOUR_QR_CODE_IMAGE_URL';
+// ✅ Fix 7: 填入真实二维码URL（base64或图片链接）
+const QR_CODE_URL  = 'https://ibb.co/rK7Fnk8b';
 const TIME_SLOT    = '12:30–14:00';
 
-const DEPTS = [
-  '总经办','三七游戏-研发事业群','37手游','37网游事业群',
+const DEPTS = ['总经办','三七游戏-研发事业群','37手游','37网游事业群',
   '37GAMES-海外发行事业群','财管与风控事业群','技术中心',
   '人力资源行政中心','战略管理中心','设计中心','产品合作中心',
-  '轻悠部落','神鞠工作室','火凤凰','妙小程'
-];
+  '轻悠部落','神鞠工作室','火凤凰','妙小程'];
 
 let S = {
   step:1, gender:null, cardType:null, pod:null,
   date:null, weekDates:[],
   name:'', dept:'', empId:'',
-  screenshot:null, orderId:null,
+  screenshot:null, screenshotFile:null, orderId:null,
   allPods:[], blockedDates:[], bookedPodsOnDate:new Set(),
   calY:new Date().getFullYear(), calM:new Date().getMonth()
 };
+
+// ── SVG illustrations ──
+const SVG_FEMALE = `<svg viewBox="0 0 80 70" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="70">
+  <rect x="5" y="30" width="70" height="30" rx="8" fill="rgba(126,200,200,0.15)" stroke="rgba(126,200,200,0.4)" stroke-width="1.5"/>
+  <rect x="8" y="33" width="30" height="24" rx="6" fill="rgba(126,200,200,0.2)" stroke="rgba(126,200,200,0.5)" stroke-width="1"/>
+  <rect x="42" y="33" width="30" height="24" rx="6" fill="rgba(126,200,200,0.12)" stroke="rgba(126,200,200,0.3)" stroke-width="1"/>
+  <circle cx="23" cy="20" r="8" fill="rgba(232,182,200,0.4)" stroke="rgba(232,182,200,0.7)" stroke-width="1.5"/>
+  <path d="M19 20 Q23 16 27 20" stroke="rgba(232,182,200,0.9)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <circle cx="57" cy="20" r="8" fill="rgba(232,182,200,0.3)" stroke="rgba(232,182,200,0.5)" stroke-width="1.5"/>
+  <rect x="10" y="55" width="60" height="4" rx="2" fill="rgba(126,200,200,0.2)"/>
+  <circle cx="23" cy="45" r="3" fill="rgba(255,255,255,0.15)"/>
+  <circle cx="57" cy="45" r="3" fill="rgba(255,255,255,0.1)"/>
+</svg>`;
+
+const SVG_MALE = `<svg viewBox="0 0 80 70" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="70">
+  <rect x="5" y="30" width="70" height="30" rx="8" fill="rgba(100,160,220,0.15)" stroke="rgba(100,160,220,0.4)" stroke-width="1.5"/>
+  <rect x="8" y="33" width="19" height="24" rx="5" fill="rgba(100,160,220,0.2)" stroke="rgba(100,160,220,0.5)" stroke-width="1"/>
+  <rect x="30" y="33" width="19" height="24" rx="5" fill="rgba(100,160,220,0.15)" stroke="rgba(100,160,220,0.35)" stroke-width="1"/>
+  <rect x="52" y="33" width="19" height="24" rx="5" fill="rgba(100,160,220,0.12)" stroke="rgba(100,160,220,0.3)" stroke-width="1"/>
+  <circle cx="17" cy="20" r="7" fill="rgba(160,200,240,0.35)" stroke="rgba(160,200,240,0.6)" stroke-width="1.5"/>
+  <circle cx="39" cy="20" r="7" fill="rgba(160,200,240,0.25)" stroke="rgba(160,200,240,0.5)" stroke-width="1.5"/>
+  <circle cx="61" cy="20" r="7" fill="rgba(160,200,240,0.2)" stroke="rgba(160,200,240,0.4)" stroke-width="1.5"/>
+  <rect x="10" y="55" width="60" height="4" rx="2" fill="rgba(100,160,220,0.2)"/>
+</svg>`;
 
 // ── Supabase ──
 async function sb(path, opts={}) {
@@ -485,54 +284,62 @@ async function sb(path, opts={}) {
 
 // ── Time rules ──
 function bookingOpen(type) {
-  const now=new Date(), h=now.getHours(), m=now.getMinutes(), mins=h*60+m, dow=now.getDay();
-  if(type==='daily') return mins>=9*60 && mins<14*60;
-  if(type==='weekly'){
-    return (dow===4&&mins>=9*60)||dow===5||dow===6||dow===0||(dow===1&&mins<14*60);
-  }
+  const now=new Date(),h=now.getHours(),m=now.getMinutes(),mins=h*60+m,dow=now.getDay();
+  if(type==='daily') return mins>=9*60&&mins<14*60;
+  if(type==='weekly') return (dow===4&&mins>=9*60)||dow===5||dow===6||dow===0||(dow===1&&mins<14*60);
   return false;
 }
 
 function getWeekDates() {
-  const now=new Date(), dow=now.getDay();
+  const now=new Date(),dow=now.getDay();
   let mon=new Date(now);
-  if(dow===4||dow===5||dow===6||dow===0){
-    const d=(8-dow)%7||7; mon.setDate(now.getDate()+d);
-  } else if(dow===1){
-    mon.setDate(now.getDate());
-  } else {
-    const d=(8-dow)%7; mon.setDate(now.getDate()+d);
-  }
-  return Array.from({length:5},(_,i)=>{
-    const d=new Date(mon); d.setDate(mon.getDate()+i);
-    return d.toISOString().slice(0,10);
-  });
+  if(dow===4||dow===5||dow===6||dow===0){ const d=(8-dow)%7||7; mon.setDate(now.getDate()+d); }
+  else if(dow===1){ mon.setDate(now.getDate()); }
+  else { const d=(8-dow)%7; mon.setDate(now.getDate()+d); }
+  return Array.from({length:5},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return d.toISOString().slice(0,10); });
 }
 
 // ── Load data ──
 async function loadBase() {
-  const [pods, blocked] = await Promise.all([
+  const [pods,blocked] = await Promise.all([
     sb('pods?select=*&is_active=eq.true&order=pod_number.asc').catch(()=>[]),
     sb('blocked_dates?select=date').catch(()=>[])
   ]);
-  S.allPods = pods||[];
-  S.blockedDates = blocked||[];
+  S.allPods=pods||[]; S.blockedDates=blocked||[];
 }
 
-// ✅ 关键：加载某日期已被预约的床位（pending + confirmed 都算占用）
-async function loadBookedPods(date) {
+async function loadBookedPodsForDate(date) {
   if(!date){S.bookedPodsOnDate=new Set();return;}
-  const rows = await sb(
+  // ✅ Fix 1&6: pending + confirmed 都算占位，截图上传后立即生效
+  const rows=await sb(
     `bookings?booking_date=eq.${date}&status=in.(pending,confirmed)&gender=eq.${S.gender}&select=pod_number`
   ).catch(()=>[]);
-  S.bookedPodsOnDate = new Set((rows||[]).map(r=>r.pod_number));
+  S.bookedPodsOnDate=new Set((rows||[]).map(r=>r.pod_number));
+  if(S.pod&&S.bookedPodsOnDate.has(S.pod)) S.pod=null;
+}
+
+// ── Image helpers ──
+// ✅ Fix 8: 压缩图片到合理大小再提交，避免payload过大导致失败
+function compressImage(dataUrl, maxW=800, quality=0.75) {
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      const scale=Math.min(1,maxW/img.width);
+      const w=Math.round(img.width*scale), h=Math.round(img.height*scale);
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL('image/jpeg',quality));
+    };
+    img.src=dataUrl;
+  });
 }
 
 // ── Saved user ──
 function savedUser(){try{return JSON.parse(localStorage.getItem('spUser')||'{}');}catch{return {};}}
 function saveUser(n,d,e){localStorage.setItem('spUser',JSON.stringify({name:n,dept:d,empId:e}));}
 
-// ── Render engine ──
+// ── Render ──
 function render(){
   updateProgress(); updateBottom();
   const c=document.getElementById('app');
@@ -555,7 +362,7 @@ function updateProgress(){
 }
 
 function updateBottom(){
-  const back=document.getElementById('btnBack'), next=document.getElementById('btnNext');
+  const back=document.getElementById('btnBack'),next=document.getElementById('btnNext');
   if(!back||!next)return;
   back.style.display=(S.step>1&&S.step<6)?'block':'none';
   document.getElementById('bottomBar').style.display=S.step===6?'none':'block';
@@ -563,149 +370,131 @@ function updateBottom(){
   next.textContent=S.step===5?'确认预约':'下一步';
 }
 
-function setNext(ok){ const b=document.getElementById('btnNext'); if(b) b.disabled=!ok; }
+function setNext(ok){const b=document.getElementById('btnNext');if(b)b.disabled=!ok;}
 
-// ── Step 1: 选区域+卡类型 ──
+// ── Step 1 ──
 function s1(){
-  const dOpen=bookingOpen('daily'), wOpen=bookingOpen('weekly');
+  const dOpen=bookingOpen('daily'),wOpen=bookingOpen('weekly');
   return `
   <div class="intro-banner">
-    <div class="intro-moon">🌙</div>
-    <div class="intro-title">午休舱预订</div>
-    <div class="intro-sub">每天 12:30–14:00 开放<br>付款后预约正式生效</div>
+    <div class="intro-icon">🌙</div>
+    <!-- ✅ Fix 1: 睡眠舱 -->
+    <div class="intro-title">睡眠舱预订</div>
+    <!-- ✅ Fix 2&3: 加上工作日 -->
+    <div class="intro-sub">工作日 12:30–14:00 开放使用<br>付款后预约正式生效</div>
   </div>
-
   <div class="sec-label">选择区域</div>
   <div class="card-grid" style="margin-bottom:20px">
     <div class="card-opt ${S.gender==='female'?'selected':''}" onclick="pick('gender','female')">
       <div class="checkmark">✓</div>
-      <div class="card-emoji">🌸</div>
+      <!-- ✅ Fix 4: SVG插图 -->
+      <div class="card-illus">${SVG_FEMALE}</div>
       <div class="card-name">女舱</div>
-      <div class="card-desc">共 16 床<br>私密安静</div>
+      <div class="card-desc">共 16 床 · 私密安静</div>
     </div>
     <div class="card-opt ${S.gender==='male'?'selected':''}" onclick="pick('gender','male')">
       <div class="checkmark">✓</div>
-      <div class="card-emoji">🔷</div>
+      <div class="card-illus">${SVG_MALE}</div>
       <div class="card-name">男舱</div>
-      <div class="card-desc">共 46 床<br>宽敞舒适</div>
+      <div class="card-desc">共 46 床 · 宽敞舒适</div>
     </div>
   </div>
-
   <div class="sec-label">选择类型</div>
   <div class="card-grid">
-    <div class="card-opt ${S.cardType==='daily'?'selected':''} ${!dOpen?'unavail':''}"
-         onclick="${dOpen?"pick('cardType','daily')":""}">
+    <div class="card-opt ${S.cardType==='daily'?'selected':''} ${!dOpen?'unavail':''}" onclick="${dOpen?"pick('cardType','daily')":""}">
       <div class="checkmark">✓</div>
-      <div class="card-emoji">📅</div>
+      <div style="font-size:28px;margin-bottom:8px">📅</div>
       <div class="card-name">日卡</div>
-      <div class="card-desc">单次使用<br>当天 9:00 开放<br>14:00 截止</div>
+      <!-- ✅ Fix 3: 加工作日 -->
+      <div class="card-desc">单次使用<br>工作日当天 9:00 开放<br>14:00 截止预约</div>
       <div class="card-price">¥10 <small>/次</small></div>
       <span class="card-pill ${dOpen?'pill-open':'pill-closed'}">${dOpen?'现在可订':'暂未开放'}</span>
     </div>
-    <div class="card-opt ${S.cardType==='weekly'?'selected':''} ${!wOpen?'unavail':''}"
-         onclick="${wOpen?"pick('cardType','weekly')":""}">
+    <div class="card-opt ${S.cardType==='weekly'?'selected':''} ${!wOpen?'unavail':''}" onclick="${wOpen?"pick('cardType','weekly')":""}">
       <div class="checkmark">✓</div>
-      <div class="card-emoji">📆</div>
+      <div style="font-size:28px;margin-bottom:8px">📆</div>
       <div class="card-name">周卡</div>
-      <div class="card-desc">一次预订整周<br>周一至周五<br>上周四 9:00 开放</div>
+      <!-- ✅ Fix 3: 加工作日 -->
+      <div class="card-desc">一次预订整周<br>周一至周五（工作日）<br>上周四 9:00 开放</div>
       <div class="card-price">¥40 <small>/周</small></div>
       <span class="card-pill ${wOpen?'pill-gold':'pill-closed'}">${wOpen?'8折优惠':'暂未开放'}</span>
     </div>
   </div>`;
 }
 
-// ── Step 2: 选床位 ──
+// ── Step 2 ──
 function s2(){
   const isFemale=S.gender==='female';
   const total=isFemale?16:46, weeklyStart=isFemale?9:24;
   const maintenance=new Set(S.allPods.filter(p=>p.gender===S.gender&&!p.is_active).map(p=>p.pod_number));
-  // ✅ 已预约床位（含 pending）
   const booked=S.bookedPodsOnDate;
-
   let cells='';
   for(let i=1;i<=total;i++){
     const isWeekly=i>=weeklyStart;
     const myType=(S.cardType==='weekly')===isWeekly;
-    const isMaint=maintenance.has(i);
-    const isBooked=booked.has(i);
+    const occ=maintenance.has(i)||booked.has(i);
     const locked=!myType;
-    const occ=isMaint||isBooked;
     const sel=S.pod===i;
-    let cls='pod'+(isWeekly?' weekly-type':'')+(locked?' pod-locked':occ?' pod-occ':sel?' pod-sel':'');
-    const click=(!locked&&!occ)?`onclick="pickPod(${i})"`:'';
-    cells+=`<div class="${cls}" ${click}>${i}</div>`;
+    const cls='pod'+(isWeekly?' weekly-type':'')+(locked?' pod-locked':occ?' pod-occ':sel?' pod-sel':'');
+    cells+=`<div class="${cls}" ${(!locked&&!occ)?`onclick="pickPod(${i})"`:''} >${i}</div>`;
   }
-
   return `
-  <div class="notice notice-info">
-    ${S.cardType==='weekly'?'虚线框 = 周卡专属床位':'实线框 = 日卡床位'} · 斜线格 = 已被预约
-  </div>
+  <div class="notice notice-info">${S.cardType==='weekly'?'虚线框 = 周卡专属床位':'实线框 = 日卡床位'} · 斜线格 = 已被预约（不可选）</div>
   <div class="pods-section">
     <div class="pods-legend">
       <div class="leg"><div class="leg-dot" style="background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12)"></div>可选</div>
-      <div class="leg"><div class="leg-dot" style="background:rgba(126,200,200,0.15);border:1.5px solid rgba(126,200,200,0.4)"></div>已选</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(126,200,200,0.9);border:1.5px solid rgba(126,200,200,1)"></div>已选</div>
       <div class="leg"><div class="leg-dot" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)"></div>已预约</div>
     </div>
     <div class="pods-grid ${S.gender}">${cells}</div>
   </div>`;
 }
 
-// ── Step 3: 选时间 ──
+// ── Step 3 ──
 function s3(){
   if(S.cardType==='weekly'){
     const wDates=getWeekDates();
     S.weekDates=wDates; S.date=wDates[0];
     const dayNames=['周一','周二','周三','周四','周五'];
     return `
+    <!-- ✅ Fix 5: 预约时间备注 -->
+    <div class="notice notice-info">📅 预约时间：以下 5 个工作日，每天 12:30–14:00</div>
     <div class="sec-label">预订周期</div>
     <div class="week-preview">
-      <div class="week-preview-label">以下 5 天将预订同一床位</div>
+      <div class="week-preview-label">本周预约日期（周一至周五）</div>
       <div class="week-dates">
-        ${wDates.map((d,i)=>`
-        <div class="week-date-cell">
-          <div class="week-date-dow">${dayNames[i]}</div>
-          <div class="week-date-num">${d.slice(5).replace('-','/')}</div>
-        </div>`).join('')}
+        ${wDates.map((d,i)=>`<div class="week-date-cell"><div class="week-date-dow">${dayNames[i]}</div><div class="week-date-num">${d.slice(5).replace('-','/')}</div></div>`).join('')}
       </div>
     </div>
-    <div class="sec-label">时段</div>
+    <div class="sec-label">使用时段</div>
     <div class="time-slot-btn sel">
       <div class="time-slot-time">12:30 – 14:00</div>
-      <div class="time-slot-sub">每天午休 · 共 5 天</div>
+      <div class="time-slot-sub">工作日午休时段 · 共 5 天</div>
     </div>`;
   }
 
-  // 日卡：日历
   const blocked=new Set(S.blockedDates.map(d=>d.date));
   const today=new Date(); today.setHours(0,0,0,0);
   const todayStr=today.toISOString().slice(0,10);
   const nowMins=new Date().getHours()*60+new Date().getMinutes();
-  const y=S.calY, m=S.calM;
+  const y=S.calY,m=S.calM;
   const monthNames=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  const firstDow=new Date(y,m,1).getDay();
+  const offset=new Date(y,m,1).getDay(); const off=offset===0?6:offset-1;
   const daysInMonth=new Date(y,m+1,0).getDate();
-  const offset=firstDow===0?6:firstDow-1;
-
   let days='';
-  for(let i=0;i<offset;i++) days+=`<div class="cal-d cal-empty"></div>`;
+  for(let i=0;i<off;i++) days+=`<div class="cal-d cal-empty"></div>`;
   for(let d=1;d<=daysInMonth;d++){
     const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dObj=new Date(y,m,d);
-    const dow=dObj.getDay(), isPast=dObj<today, isToday=ds===todayStr;
-    const isWe=dow===0||dow===6;
-    const isBlocked=blocked.has(ds);
+    const dObj=new Date(y,m,d); const dow=dObj.getDay();
+    const isPast=dObj<today,isToday=ds===todayStr,isWe=dow===0||dow===6,isBlocked=blocked.has(ds);
     let dis=isPast||isBlocked||isWe;
     if(isToday&&nowMins>=14*60) dis=true;
-    const cls=['cal-d',
-      isToday&&!dis?'cal-today':'',
-      S.date===ds?'cal-sel':'',
-      isBlocked?'cal-blocked':dis?'cal-dis':'',
-      isWe&&!dis?'cal-we':''
-    ].filter(Boolean).join(' ');
+    const cls=['cal-d',isToday&&!dis?'cal-today':'',S.date===ds?'cal-sel':'',isBlocked?'cal-blocked':dis?'cal-dis':'',isWe&&!dis?'cal-we':''].filter(Boolean).join(' ');
     days+=`<div class="${cls}" ${!dis?`onclick="pickDate('${ds}')"`:''}>${d}</div>`;
   }
-
   return `
+  <!-- ✅ Fix 5: 预约时间备注 -->
+  <div class="notice notice-info">📅 预约时间：选择工作日日期，使用时段固定 12:30–14:00</div>
   <div class="sec-label">选择日期</div>
   <div class="cal-wrap">
     <div class="cal-head">
@@ -714,56 +503,47 @@ function s3(){
       <button class="cal-nav" onclick="chMonth(1)">›</button>
     </div>
     <div class="cal-dow">
-      <div class="cal-dow-cell">一</div><div class="cal-dow-cell">二</div>
-      <div class="cal-dow-cell">三</div><div class="cal-dow-cell">四</div>
-      <div class="cal-dow-cell">五</div>
+      <div class="cal-dow-cell">一</div><div class="cal-dow-cell">二</div><div class="cal-dow-cell">三</div>
+      <div class="cal-dow-cell">四</div><div class="cal-dow-cell">五</div>
       <div class="cal-dow-cell we">六</div><div class="cal-dow-cell we">日</div>
     </div>
     <div class="cal-days">${days}</div>
   </div>
   ${S.date?`
-  <div class="sec-label">时段</div>
+  <div class="sec-label">使用时段</div>
   <div class="time-slot-btn sel">
     <div class="time-slot-time">12:30 – 14:00</div>
-    <div class="time-slot-sub">午休时段（90 分钟）</div>
-  </div>
-  <div class="notice notice-info" style="margin-top:10px">已选日期：${S.date}，时段固定，点击"下一步"继续</div>`:''}`;
+    <div class="time-slot-sub">工作日午休时段（90 分钟）</div>
+  </div>`:''}`;
 }
 
-// ── Step 4: 填信息 ──
+// ── Step 4 ──
 function s4(){
   const sv=savedUser();
-  const name=S.name||sv.name||'', dept=S.dept||sv.dept||'', empId=S.empId||sv.empId||'';
+  const name=S.name||sv.name||'',dept=S.dept||sv.dept||'',empId=S.empId||sv.empId||'';
   const amount=S.cardType==='weekly'?40:10;
-  const dateDisp=S.cardType==='weekly'?`${S.weekDates[0]} 至 ${S.weekDates[4]}（5天）`:S.date;
+  const dateDisp=S.cardType==='weekly'?`${S.weekDates[0]} 至 ${S.weekDates[4]}（5个工作日）`:S.date;
   return `
   ${(name||dept||empId)?'<div class="notice notice-info">已自动填入上次信息，如有变化请修改</div>':''}
-  <div class="form-group">
-    <label class="form-label">姓名</label>
-    <input class="form-input" id="fName" value="${name}" placeholder="请输入真实姓名" oninput="checkForm()">
-  </div>
-  <div class="form-group">
-    <label class="form-label">事业群</label>
+  <div class="form-group"><label class="form-label">姓名</label><input class="form-input" id="fName" value="${name}" placeholder="请输入真实姓名" oninput="checkForm()"></div>
+  <div class="form-group"><label class="form-label">事业群</label>
     <select class="form-input" id="fDept" onchange="checkForm()">
       <option value="">请选择事业群</option>
       ${DEPTS.map(d=>`<option value="${d}"${dept===d?' selected':''}>${d}</option>`).join('')}
     </select>
   </div>
-  <div class="form-group">
-    <label class="form-label">工号</label>
-    <input class="form-input" id="fEmpId" value="${empId}" placeholder="请输入工号" oninput="checkForm()">
-  </div>
+  <div class="form-group"><label class="form-label">工号</label><input class="form-input" id="fEmpId" value="${empId}" placeholder="请输入工号" oninput="checkForm()"></div>
   <div class="summary">
     <div class="sum-row"><span class="sum-label">区域</span><span class="sum-val">${S.gender==='female'?'女舱':'男舱'}</span></div>
     <div class="sum-row"><span class="sum-label">床位</span><span class="sum-val">床位 #${S.pod}</span></div>
-    <div class="sum-row"><span class="sum-label">类型</span><span class="sum-val">${S.cardType==='weekly'?'周卡（5天）':'日卡（单次）'}</span></div>
-    <div class="sum-row"><span class="sum-label">日期</span><span class="sum-val">${dateDisp}</span></div>
-    <div class="sum-row"><span class="sum-label">时段</span><span class="sum-val">12:30–14:00</span></div>
+    <div class="sum-row"><span class="sum-label">类型</span><span class="sum-val">${S.cardType==='weekly'?'周卡（5个工作日）':'日卡（单次）'}</span></div>
+    <div class="sum-row"><span class="sum-label">预约日期</span><span class="sum-val">${dateDisp}</span></div>
+    <div class="sum-row"><span class="sum-label">使用时段</span><span class="sum-val">工作日 12:30–14:00</span></div>
     <div class="sum-row total"><span class="sum-label">应付金额</span><span class="sum-val">¥${amount}</span></div>
   </div>`;
 }
 
-// ── Step 5: 付款 ──
+// ── Step 5 ──
 function s5(){
   const amount=S.cardType==='weekly'?40:10;
   const qrOk=QR_CODE_URL!=='YOUR_QR_CODE_IMAGE_URL';
@@ -771,19 +551,15 @@ function s5(){
   <div class="pay-box">
     <div class="pay-tag">应付金额</div>
     <div class="pay-amount">¥${amount}</div>
-    <div class="pay-amount-sub">${S.cardType==='weekly'?'5 天 × ¥8 = ¥40（8折）':'日卡单次'}</div>
+    <div class="pay-amount-sub">${S.cardType==='weekly'?'5 个工作日 × ¥8 = ¥40（8折）':'日卡单次'}</div>
     <div class="pay-qr-wrap">
-      ${qrOk?`<img src="${QR_CODE_URL}" style="width:100%;height:100%;object-fit:cover">`
-        :`<div class="pay-qr-placeholder">📱<br>请联系管理员<br>上传收款码</div>`}
+      ${qrOk?`<img src="${QR_CODE_URL}" alt="收款码">`:`<div class="pay-qr-placeholder">📱<br>收款码加载中<br>或联系管理员</div>`}
     </div>
     <div class="pay-methods">
-      <span class="pay-method">支付宝</span>
-      <span class="pay-method">银联</span>
-      <span class="pay-method">云闪付</span>
+      <span class="pay-method">支付宝</span><span class="pay-method">银联</span><span class="pay-method">云闪付</span>
     </div>
     <div class="pay-note">付款备注请填写：<strong>${S.name} ${S.empId}</strong><br>支付完成后，请上传付款截图</div>
   </div>
-
   <div class="sec-label">上传付款截图</div>
   <div class="upload-area ${S.screenshot?'has-file':''}" onclick="document.getElementById('fileInput').click()">
     <input type="file" id="fileInput" accept="image/*" onchange="onFile(event)">
@@ -791,26 +567,26 @@ function s5(){
       ?`<div class="upload-icon">✅</div><div class="upload-text"><strong>截图已上传</strong><br>点击重新选择</div><img src="${S.screenshot}" class="upload-preview">`
       :`<div class="upload-icon">📸</div><div class="upload-text"><strong>点击上传截图</strong><br>支持 JPG、PNG</div>`}
   </div>
-  <div class="notice notice-warn" style="margin-top:14px">截图上传后，管理员确认收款即正式生效。预约不可退订，请确认信息无误。</div>`;
+  <div class="notice notice-warn" style="margin-top:14px">⚠️ 上传截图后床位即刻锁定，管理员确认收款后预约正式生效。预约不可退订，请确认无误。</div>`;
 }
 
-// ── Step 6: 完成 ──
+// ── Step 6 ──
 function s6(){
   const amount=S.cardType==='weekly'?40:10;
-  const dateDisp=S.cardType==='weekly'?`${S.weekDates[0]} ~ ${S.weekDates[4]}`:S.date;
+  const dateDisp=S.cardType==='weekly'?`${S.weekDates[0]} ~ ${S.weekDates[4]}（5个工作日）`:S.date;
   return `
   <div class="success-wrap">
     <div class="success-anim">🌙</div>
     <div class="success-title">预约已提交！</div>
-    <div class="success-sub">管理员确认收款后正式生效<br>请留意工作群通知</div>
+    <div class="success-sub">床位已锁定，管理员确认收款后正式生效<br>请留意工作群通知</div>
     <div class="ticket">
       <div class="ticket-id">订单号 ${S.orderId||'—'}</div>
       <div class="ticket-row"><span>姓名</span><span>${S.name}</span></div>
       <div class="ticket-row"><span>工号</span><span>${S.empId}</span></div>
       <div class="ticket-row"><span>区域 / 床位</span><span>${S.gender==='female'?'女舱':'男舱'} #${S.pod}</span></div>
-      <div class="ticket-row"><span>日期</span><span>${dateDisp}</span></div>
-      <div class="ticket-row"><span>时段</span><span>12:30–14:00</span></div>
-      <div class="ticket-row"><span>类型</span><span>${S.cardType==='weekly'?'周卡（5天）':'日卡'}</span></div>
+      <div class="ticket-row"><span>预约日期</span><span>${dateDisp}</span></div>
+      <div class="ticket-row"><span>使用时段</span><span>工作日 12:30–14:00</span></div>
+      <div class="ticket-row"><span>类型</span><span>${S.cardType==='weekly'?'周卡（5个工作日）':'日卡'}</span></div>
       <div class="ticket-row"><span>金额</span><span class="ticket-amount">¥${amount}</span></div>
     </div>
     <div class="pending-box">⏳ 床位已为您锁定，待管理员确认收款后预约正式生效。预约不支持退订。</div>
@@ -821,39 +597,22 @@ function s6(){
 // ── Actions ──
 function pick(key,val){
   S[key]=val;
-  if(key==='gender'||key==='cardType'){ S.pod=null; S.date=null; S.weekDates=[]; S.bookedPodsOnDate=new Set(); }
-  render();
-  setNext(!!(S.gender&&S.cardType));
+  if(key==='gender'||key==='cardType'){S.pod=null;S.date=null;S.weekDates=[];S.bookedPodsOnDate=new Set();}
+  render(); setNext(!!(S.gender&&S.cardType));
 }
 
-function pickPod(n){ S.pod=n; render(); setNext(true); }
+function pickPod(n){S.pod=n;render();setNext(true);}
 
 async function pickDate(d){
   S.date=d;
-  // ✅ 选日期时立即加载该日期已预约的床位
-  if(S.pod){
-    // date chosen, refresh pod availability for this date
-  }
   await loadBookedPodsForDate(d);
   render(); setNext(true);
 }
 
-async function loadBookedPodsForDate(date){
-  if(!date)return;
-  const rows=await sb(
-    `bookings?booking_date=eq.${date}&status=in.(pending,confirmed)&gender=eq.${S.gender}&select=pod_number`
-  ).catch(()=>[]);
-  S.bookedPodsOnDate=new Set((rows||[]).map(r=>r.pod_number));
-  // If currently selected pod got booked, deselect it
-  if(S.pod&&S.bookedPodsOnDate.has(S.pod)){ S.pod=null; }
-}
-
 function chMonth(d){
   S.calM+=d;
-  if(S.calM>11){S.calM=0;S.calY++;}
-  if(S.calM<0){S.calM=11;S.calY--;}
-  document.getElementById('app').innerHTML=s3();
-  afterRender();
+  if(S.calM>11){S.calM=0;S.calY++;} if(S.calM<0){S.calM=11;S.calY--;}
+  document.getElementById('app').innerHTML=s3(); afterRender();
 }
 
 function checkForm(){
@@ -863,31 +622,37 @@ function checkForm(){
   setNext(!!(S.name&&S.dept&&S.empId));
 }
 
-function onFile(e){
+// ✅ Fix 8: 压缩后再存，避免提交失败
+async function onFile(e){
   const f=e.target.files[0]; if(!f)return;
-  const r=new FileReader();
-  r.onload=ev=>{S.screenshot=ev.target.result;render();setNext(true);};
-  r.readAsDataURL(f);
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    try{
+      const compressed=await compressImage(ev.target.result);
+      S.screenshot=compressed;
+    }catch{
+      S.screenshot=ev.target.result;
+    }
+    render(); setNext(true);
+  };
+  reader.readAsDataURL(f);
 }
 
 // ── Navigation ──
-function goBack(){ if(S.step>1){S.step--;render();} }
+function goBack(){if(S.step>1){S.step--;render();}}
 
 async function goNext(){
   if(S.step===1){
     S.step=2;
     document.getElementById('app').innerHTML='<div class="loading-dots">加载床位中 <span class="dot">•</span><span class="dot">•</span><span class="dot">•</span></div>';
     await loadBase();
-    // ✅ 如果已经选了日期（如重新进入），预加载已预约床位
-    if(S.date) await loadBookedPodsForDate(S.date);
     render(); setNext(!!S.pod);
   } else if(S.step===2){
     S.step=3; render(); setNext(S.cardType==='weekly'||(S.date!=null));
   } else if(S.step===3){
     S.step=4; render();
   } else if(S.step===4){
-    saveUser(S.name,S.dept,S.empId);
-    S.step=5; render(); setNext(!!S.screenshot);
+    saveUser(S.name,S.dept,S.empId); S.step=5; render(); setNext(!!S.screenshot);
   } else if(S.step===5){
     await submit();
   }
@@ -900,6 +665,9 @@ async function submit(){
     const pod=S.allPods.find(p=>p.gender===S.gender&&p.pod_number===S.pod);
     const amount=S.cardType==='weekly'?40:10;
     const dateToSave=S.cardType==='weekly'?S.weekDates[0]:S.date;
+
+    // ✅ Fix 8: 截图太大时只存标记，不存base64到bookings表
+    // 先创建booking记录
     const res=await sb('bookings',{
       method:'POST', prefer:'return=representation',
       body:JSON.stringify({
@@ -907,30 +675,30 @@ async function submit(){
         card_type:S.cardType, booking_date:dateToSave, time_slot:TIME_SLOT,
         name:S.name, department:S.dept, employee_id:S.empId,
         status:'pending', is_free:false, payment_amount:amount,
-        payment_screenshot:S.screenshot?'已上传':null
+        payment_screenshot: S.screenshot ? '已上传' : null
       })
     });
     S.orderId=res?.[0]?.id||'N/A';
     S.step=6; render();
   }catch(e){
     btn.disabled=false; btn.textContent='确认预约';
-    toast('提交失败，请重试');
+    toast('提交失败：'+e.message.slice(0,60)+'，请重试');
+    console.error(e);
   }
 }
 
 function restart(){
   const base={allPods:S.allPods,blockedDates:S.blockedDates};
-  S={step:1,gender:null,cardType:null,pod:null,date:null,weekDates:[],
-    name:'',dept:'',empId:'',screenshot:null,orderId:null,
-    bookedPodsOnDate:new Set(),calY:new Date().getFullYear(),calM:new Date().getMonth(),...base};
+  S={step:1,gender:null,cardType:null,pod:null,date:null,weekDates:[],name:'',dept:'',empId:'',
+    screenshot:null,screenshotFile:null,orderId:null,bookedPodsOnDate:new Set(),
+    calY:new Date().getFullYear(),calM:new Date().getMonth(),...base};
   document.getElementById('bottomBar').style.display='block';
   render();
 }
 
 function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
 
 render();
