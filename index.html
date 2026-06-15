@@ -839,6 +839,39 @@ async function loadBase(){
   S.blocked=new Set((bk||[]).map(d=>d.date));
 }
 
+async function uploadScreenshot(bookingId) {
+  if (!S.screenshot) return null;
+  try {
+    // 把 base64 转成 Blob
+    const res = await fetch(S.screenshot);
+    const blob = await res.blob();
+    const filename = `${bookingId}.jpg`;
+
+    // 上传到 Supabase Storage bucket: screenshots
+    const upRes = await fetch(
+      `${SUPA_URL}/storage/v1/object/screenshots/${filename}`,
+      {
+        method: 'POST',
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Content-Type': 'image/jpeg',
+          'x-upsert': 'true'
+        },
+        body: blob
+      }
+    );
+    if (!upRes.ok) {
+      // storage上传失败，降级：把压缩后base64直接存（最多尝试一次）
+      return S.screenshot;
+    }
+    // 返回公开访问URL
+    return `${SUPA_URL}/storage/v1/object/public/screenshots/${filename}`;
+  } catch(e) {
+    return S.screenshot; // 降级返回base64
+  }
+}
+
 async function submit(){
   const btn=document.getElementById('btnNxt');
   btn.disabled=true;document.getElementById('btnTxt').textContent='提交中…';
@@ -847,7 +880,7 @@ async function submit(){
     const amount=S.cardType==='weekly'?40:10;
     const dateToSave=S.cardType==='weekly'?S.weekDates[0]:S.date;
 
-    // ✅ Fix 5: 先查是否已有重复记录，避免23505唯一键冲突
+    // 先查是否已有重复记录
     const exist=await sb(
       `bookings?pod_id=eq.${pod?.id}&booking_date=eq.${dateToSave}&time_slot=eq.${encodeURIComponent(SLOT)}&status=in.(pending,confirmed)&select=id`
     ).catch(()=>[]);
@@ -857,6 +890,8 @@ async function submit(){
       return;
     }
 
+    // 先创建预约记录（不含截图），拿到 ID
+    document.getElementById('btnTxt').textContent='提交中(1/2)…';
     const res=await sb('bookings',{
       method:'POST',prefer:'return=representation',
       body:JSON.stringify({
@@ -864,21 +899,33 @@ async function submit(){
         card_type:S.cardType,booking_date:dateToSave,time_slot:SLOT,
         name:S.name,department:'',employee_id:S.empId,
         status:'pending',is_free:false,payment_amount:amount,
-        // 存储实际截图base64，让后台可以查看
-        payment_screenshot:S.screenshot||null
+        payment_screenshot:'上传中'
       })
     });
-    S.orderId=res?.[0]?.id||'N/A';
+    const bookingId=res?.[0]?.id;
+    S.orderId=bookingId||'N/A';
+
+    // 再上传截图（用 Storage，失败也不影响预约）
+    if(S.screenshot&&bookingId){
+      document.getElementById('btnTxt').textContent='上传截图(2/2)…';
+      const screenshotUrl=await uploadScreenshot(bookingId);
+      // 更新截图字段
+      await sb(`bookings?id=eq.${bookingId}`,{
+        method:'PATCH',
+        prefer:'return=minimal',
+        body:JSON.stringify({payment_screenshot:screenshotUrl||'已上传'})
+      }).catch(()=>{});
+    }
+
     S.step=6;render();
   }catch(e){
     btn.disabled=false;document.getElementById('btnTxt').textContent='确认预约';
-    // ✅ Fix 5: 捕获23505，给用户友好提示
     const msg=e.message||'';
     if(msg.includes('23505')||msg.includes('duplic')){
       toast('该床位已被预约，请返回重新选择其他床位');
     } else {
-      toast('提交失败，请重试');
-      console.error(e);
+      toast('提交失败：'+(msg.slice(0,60)||'请重试'));
+      console.error('submit error',e);
     }
   }
 }
