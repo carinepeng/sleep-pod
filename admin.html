@@ -227,6 +227,7 @@
         <div class="nav-section">配置</div>
         <div class="nav-item" onclick="showPage('pods')" id="nav-pods">🛏️ 床位管理</div>
         <div class="nav-item" onclick="showPage('holidays')" id="nav-holidays">📅 节假日配置</div>
+        <div class="nav-item" onclick="showPage('time-settings')" id="nav-time-settings">⏰ 时间配置</div>
       </div>
       <div class="sidebar-footer">
         <button class="logout-btn" onclick="doLogout()">退出登录</button>
@@ -306,7 +307,7 @@ function doLogout() {
 }
 
 // ============ NAV ============
-function showPage(page) {
+async function showPage(page) {
   currentPage = page;
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   const nav = document.getElementById('nav-' + page);
@@ -314,7 +315,7 @@ function showPage(page) {
   renderPage();
 }
 
-function renderPage() {
+async function renderPage() {
   const c = document.getElementById('mainContent');
   switch(currentPage) {
     case 'dashboard': c.innerHTML = renderDashboard(); break;
@@ -323,6 +324,7 @@ function renderPage() {
     case 'free-booking': c.innerHTML = renderFreeBooking(); break;
     case 'pods': c.innerHTML = renderPods(); break;
     case 'holidays': c.innerHTML = renderHolidays(); break;
+    case 'time-settings': c.innerHTML = await renderTimeSettings(); break;
   }
 }
 
@@ -802,7 +804,134 @@ async function removeBlockedDate(id) {
   await loadAll(); renderPage();
 }
 
-// ============ HELPERS ============
+// ============ TIME SETTINGS ============
+let siteSettings = {};
+
+async function loadSiteSettings() {
+  const rows = await sbFetch('settings?select=key,value,label').catch(()=>[]);
+  siteSettings = {};
+  (rows||[]).forEach(r => siteSettings[r.key] = r);
+}
+
+async function renderTimeSettings() {
+  await loadSiteSettings();
+  const s = siteSettings;
+  const v = key => s[key]?.value || '';
+  const dayName = n => ['日','一','二','三','四','五','六'][parseInt(n)] || n;
+
+  return `
+  <div class="page-header">
+    <div class="page-title">时间配置</div>
+    <div class="page-sub">修改后立即生效，用户刷新页面即可看到最新时间</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>🛏️ 睡眠舱使用时段</h3></div>
+    <div class="notice" style="margin:16px 20px 0">这是员工实际进入睡眠舱的时间段，会显示在预订页顶部。</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>开始时间</label>
+        <input type="time" id="s-use_start" value="${v('use_start')}" class="form-group input">
+      </div>
+      <div class="form-group">
+        <label>结束时间</label>
+        <input type="time" id="s-use_end" value="${v('use_end')}" class="form-group input">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveSettings(['use_start','use_end'])">保存使用时段</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-head"><h3>📅 日卡预约时间窗口</h3></div>
+    <div class="notice" style="margin:16px 20px 0">日卡每个工作日独立开放，当天到点才能预订。</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>每天开放预订时间</label>
+        <input type="time" id="s-daily_book_start" value="${v('daily_book_start')}">
+      </div>
+      <div class="form-group">
+        <label>每天截止预订时间</label>
+        <input type="time" id="s-daily_book_end" value="${v('daily_book_end')}">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveSettings(['daily_book_start','daily_book_end'])">保存日卡设置</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-head"><h3>📆 周卡预约时间窗口</h3></div>
+    <div class="notice" style="margin:16px 20px 0">周卡每周开放一次，从指定星期几的某时开始，到下周指定星期几的某时截止。</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>开放预订（星期几）</label>
+        <select id="s-weekly_book_day">
+          ${[1,2,3,4,5,6,0].map(n=>`<option value="${n}" ${v('weekly_book_day')==String(n)?'selected':''}>周${dayName(n)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>开放时间</label>
+        <input type="time" id="s-weekly_book_start" value="${v('weekly_book_start')}">
+      </div>
+      <div class="form-group">
+        <label>截止预订（星期几）</label>
+        <select id="s-weekly_book_close_day">
+          ${[1,2,3,4,5,6,0].map(n=>`<option value="${n}" ${v('weekly_book_close_day')==String(n)?'selected':''}>周${dayName(n)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>截止时间</label>
+        <input type="time" id="s-weekly_book_close" value="${v('weekly_book_close')}">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveSettings(['weekly_book_day','weekly_book_start','weekly_book_close_day','weekly_book_close'])">保存周卡设置</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-head"><h3>当前配置预览</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>配置项</th><th>当前值</th><th>说明</th></tr></thead>
+        <tbody>
+          ${Object.values(s).map(r=>`
+          <tr>
+            <td style="font-family:monospace;font-size:12px;color:var(--gray3)">${r.key}</td>
+            <td><strong>${r.value}</strong></td>
+            <td style="color:var(--gray3)">${r.label||''}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+async function saveSettings(keys) {
+  const updates = [];
+  for (const key of keys) {
+    const el = document.getElementById('s-' + key);
+    if (!el) continue;
+    const val = el.value.trim();
+    if (!val) { alert(`请填写：${key}`); return; }
+    updates.push({ key, value: val });
+  }
+  try {
+    for (const u of updates) {
+      await sbFetch(`settings?key=eq.${u.key}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ value: u.value, updated_at: new Date().toISOString() })
+      });
+    }
+    alert('✅ 保存成功！用户刷新页面即可看到最新时间。');
+    await loadSiteSettings();
+    renderPage();
+  } catch(e) {
+    alert('保存失败：' + e.message);
+  }
+}
 function statusBadge(status) {
   const map = { pending: '⏳ 待确认', confirmed: '✅ 已确认', released: '🔓 已释放' };
   const cls = { pending: 'pending', confirmed: 'confirmed', released: 'released' };
