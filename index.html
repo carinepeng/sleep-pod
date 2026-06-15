@@ -279,7 +279,7 @@ select.form-inp option{background:#111f35;}
       <div class="hdr-title">睡眠舱预约</div>
       <div class="hdr-sub">安静休憩，充电再出发</div>
     </div>
-    <div class="hdr-badge">工作日 12:30–14:00</div>
+    <div class="hdr-badge" id="hdrBadge">工作日 12:30–14:00</div>
   </div>
 
   <div class="info-bar">
@@ -315,7 +315,30 @@ const DEPTS=['总经办','三七游戏-研发事业群','37手游','37网游事�
   '人力资源行政中心','战略管理中心','设计中心','产品合作中心',
   '轻悠部落','神鞠工作室','火凤凰','妙小程'];
 
-const SLOT='12:30–14:00';
+// ── Dynamic settings (loaded from DB) ──
+let CFG = {
+  use_start: '12:30',
+  use_end: '14:00',
+  daily_book_start: '09:00',
+  daily_book_end: '14:00',
+  weekly_book_day: '4',
+  weekly_book_start: '09:00',
+  weekly_book_close_day: '1',
+  weekly_book_close: '14:00'
+};
+let SLOT = '12:30–14:00'; // updated after settings load
+
+async function loadSettings() {
+  try {
+    const rows = await sb('settings?select=key,value');
+    if (rows && rows.length) {
+      rows.forEach(r => { CFG[r.key] = r.value; });
+    }
+    SLOT = `${CFG.use_start}–${CFG.use_end}`;
+  } catch(e) { /* use defaults */ }
+}
+
+function toMins(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
 
 let S={
   step:1,gender:null,cardType:null,pod:null,
@@ -349,11 +372,21 @@ async function sb(path,opts={}){
   try{return JSON.parse(txt);}catch{return null;}
 }
 
-// ── booking open rules ──
+// ── booking open rules (uses DB settings) ──
 function isOpen(type){
-  const now=new Date(),h=now.getHours(),m=now.getMinutes(),mins=h*60+m,dow=now.getDay();
-  if(type==='daily') return mins>=9*60&&mins<14*60;
-  if(type==='weekly') return (dow===4&&mins>=9*60)||dow===5||dow===6||dow===0||(dow===1&&mins<14*60);
+  const now=new Date(),mins=now.getHours()*60+now.getMinutes(),dow=now.getDay();
+  if(type==='daily'){
+    return mins>=toMins(CFG.daily_book_start) && mins<toMins(CFG.daily_book_end);
+  }
+  if(type==='weekly'){
+    const openDay=parseInt(CFG.weekly_book_day);     // e.g. 4=Thu
+    const closeDay=parseInt(CFG.weekly_book_close_day); // e.g. 1=Mon
+    const openOk  = dow===openDay && mins>=toMins(CFG.weekly_book_start);
+    const closeOk = dow===closeDay && mins<toMins(CFG.weekly_book_close);
+    // open: from openDay to closeDay (spanning weekend)
+    const betweenDays = dow>openDay || dow<closeDay || (dow===0); // Fri/Sat/Sun
+    return openOk || betweenDays || closeOk;
+  }
   return false;
 }
 
@@ -389,7 +422,7 @@ function getThisWeekDailyDates(){
     const d=new Date(mon);d.setDate(mon.getDate()+i);
     const ds=d.toISOString().slice(0,10);
     if(ds<today) continue;
-    if(ds===today&&nowMins>=14*60) continue;
+    if(ds===today&&nowMins>=toMins(CFG.daily_book_end)) continue;
     if(S.blocked.has(ds)) continue;
     dates.push(ds);
   }
@@ -454,7 +487,7 @@ function s1(){
     <div class="hero-moon">🌙</div>
     <div class="hero-text">
       <h2>睡眠舱预约</h2>
-      <p>工作日 12:30 – 14:00 开放使用<br>付款后预约正式生效</p>
+      <p>工作日 ${CFG.use_start} – ${CFG.use_end} 开放使用<br>付款后预约正式生效</p>
     </div>
   </div>
 
@@ -776,6 +809,7 @@ async function goNext(){
 }
 
 async function loadBase(){
+  await loadSettings(); // ← load settings first
   const [pods,bk]=await Promise.all([
     sb('pods?select=*&is_active=eq.true&order=pod_number.asc').catch(()=>[]),
     sb('blocked_dates?select=date').catch(()=>[])
@@ -842,7 +876,15 @@ function toast(msg){
   setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-render();
+// ── init: load settings then render ──
+(async function init(){
+  await loadSettings();
+  const badge=document.getElementById('hdrBadge');
+  if(badge) badge.textContent=`工作日 ${CFG.use_start}–${CFG.use_end}`;
+  const infoL=document.querySelector('.info-bar-left');
+  if(infoL) infoL.innerHTML=`⏰ 工作日 ${CFG.use_start} – ${CFG.use_end}`;
+  render();
+})();
 </script>
 </body>
 </html>
