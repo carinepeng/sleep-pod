@@ -429,20 +429,41 @@ function getThisWeekDailyDates(){
   return dates;
 }
 
-// ── image compress ──
-function compress(dataUrl,maxW=800,q=0.72){
-  return new Promise(res=>{
-    const img=new Image();
-    img.onload=()=>{
-      const scale=Math.min(1,maxW/img.width);
-      const w=Math.round(img.width*scale),h=Math.round(img.height*scale);
-      const c=document.createElement('canvas');
-      c.width=w;c.height=h;
-      c.getContext('2d').drawImage(img,0,0,w,h);
-      res(c.toDataURL('image/jpeg',q));
+// ── image compress（多轮压缩，确保 < 800KB）──
+const MAX_BYTES = 800 * 1024;
+
+function resizeEncode(img, maxW, quality) {
+  const scale = Math.min(1, maxW / img.width);
+  const w = Math.round(img.width * scale);
+  const h = Math.round(img.height * scale);
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  c.getContext('2d').drawImage(img, 0, 0, w, h);
+  return c.toDataURL('image/jpeg', quality);
+}
+
+function compress(dataUrl) {
+  return new Promise(res => {
+    const img = new Image();
+    img.onerror = () => res(dataUrl);
+    img.onload = () => {
+      const widths    = [1200, 900, 700, 500, 380];
+      const qualities = [0.75, 0.6, 0.45, 0.3, 0.18];
+      let smallest = null;
+      for (const maxW of widths) {
+        for (const q of qualities) {
+          const candidate = resizeEncode(img, maxW, q);
+          if (!smallest || candidate.length < smallest.length) smallest = candidate;
+          // base64 length * 0.75 ≈ bytes
+          if (candidate.length * 0.75 < MAX_BYTES) {
+            res(candidate);
+            return;
+          }
+        }
+      }
+      res(smallest || dataUrl);
     };
-    img.onerror=()=>res(dataUrl);
-    img.src=dataUrl;
+    img.src = dataUrl;
   });
 }
 
