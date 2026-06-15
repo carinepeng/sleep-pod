@@ -327,6 +327,20 @@ function renderPage() {
 }
 
 // ============ DASHBOARD ============
+let chartOffset = 0; // 0=最近7天, -7=前7天, +7=后7天
+
+function buildDays(offset) {
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i - offset);
+    const ds = d.toISOString().slice(0,10);
+    const rev = allBookings.filter(b => b.booking_date === ds && b.status === 'confirmed' && !b.is_free).reduce((s,b)=>s+(b.payment_amount||0),0);
+    const cnt = allBookings.filter(b => b.booking_date === ds && b.status === 'confirmed').length;
+    days.push({ ds, rev, cnt, label: `${d.getMonth()+1}/${d.getDate()}` });
+  }
+  return days;
+}
+
 function renderDashboard() {
   const today = new Date().toISOString().slice(0,10);
   const todayB = allBookings.filter(b => b.booking_date === today);
@@ -335,16 +349,11 @@ function renderDashboard() {
   const pending = allBookings.filter(b => b.status === 'pending').length;
   const totalPods = allPods.filter(p => p.is_active).length;
 
-  // Weekly revenue chart (last 7 days)
-  const days = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const ds = d.toISOString().slice(0,10);
-    const rev = allBookings.filter(b => b.booking_date === ds && b.status === 'confirmed' && !b.is_free).reduce((s,b)=>s+(b.payment_amount||0),0);
-    const cnt = allBookings.filter(b => b.booking_date === ds && b.status === 'confirmed').length;
-    days.push({ ds, rev, cnt, label: `${d.getMonth()+1}/${d.getDate()}` });
-  }
+  const days = buildDays(chartOffset);
   const maxRev = Math.max(...days.map(d=>d.rev), 1);
+  const maxCnt = Math.max(...days.map(d=>d.cnt), 1);
+  const periodLabel = chartOffset === 0 ? '最近7天' : chartOffset > 0 ? `前${chartOffset+7}～${chartOffset+1}天` : `后${-chartOffset-6}～${-chartOffset}天`;
+  const canNext = chartOffset > 0;
 
   const recentBookings = allBookings.slice(0, 8);
 
@@ -379,12 +388,19 @@ function renderDashboard() {
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
     <div class="card">
-      <div class="card-head"><h3>近7日收款（元）</h3></div>
+      <div class="card-head">
+        <h3>收款（元）</h3>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:var(--gray3)">${periodLabel}</span>
+          <button class="btn btn-view" onclick="shiftChart(7)" style="padding:3px 10px;font-size:12px">← 前7天</button>
+          <button class="btn btn-view" onclick="shiftChart(-7)" style="padding:3px 10px;font-size:12px" ${!canNext?'disabled style="opacity:.4;cursor:not-allowed;padding:3px 10px;font-size:12px"':''}>后7天 →</button>
+        </div>
+      </div>
       <div class="chart-wrap">
         <div class="bar-chart">
           ${days.map(d=>`
             <div class="bar-item">
-              <div class="bar-val">¥${d.rev}</div>
+              <div class="bar-val" style="font-size:10px">¥${d.rev}</div>
               <div class="bar" style="height:${Math.max(d.rev/maxRev*100,4)}px" title="${d.ds}: ¥${d.rev}"></div>
               <div class="bar-label">${d.label}</div>
             </div>
@@ -393,16 +409,23 @@ function renderDashboard() {
       </div>
     </div>
     <div class="card">
-      <div class="card-head"><h3>近7日预约量</h3></div>
+      <div class="card-head">
+        <h3>预约量</h3>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:var(--gray3)">${periodLabel}</span>
+          <button class="btn btn-view" onclick="shiftChart(7)" style="padding:3px 10px;font-size:12px">← 前7天</button>
+          <button class="btn btn-view" onclick="shiftChart(-7)" style="padding:3px 10px;font-size:12px" ${!canNext?'disabled style="opacity:.4;cursor:not-allowed;padding:3px 10px;font-size:12px"':''}>后7天 →</button>
+        </div>
+      </div>
       <div class="chart-wrap">
         <div class="bar-chart">
-          ${days.map(d=>{const mx=Math.max(...days.map(x=>x.cnt),1);return`
+          ${days.map(d=>`
             <div class="bar-item">
-              <div class="bar-val">${d.cnt}</div>
-              <div class="bar" style="height:${Math.max(d.cnt/mx*100,4)}px;background:var(--teal-light)" title="${d.ds}: ${d.cnt}次"></div>
+              <div class="bar-val" style="font-size:10px">${d.cnt}</div>
+              <div class="bar" style="height:${Math.max(d.cnt/maxCnt*100,4)}px;background:var(--teal-light)" title="${d.ds}: ${d.cnt}次"></div>
               <div class="bar-label">${d.label}</div>
             </div>
-          `}).join('')}
+          `).join('')}
         </div>
       </div>
     </div>
@@ -415,7 +438,7 @@ function renderDashboard() {
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>姓名</th><th>工号</th><th>区域/床位</th><th>日期</th><th>时段</th><th>金额</th><th>状态</th></tr></thead>
+        <thead><tr><th>姓名</th><th>工号</th><th>区域/床位</th><th>类型</th><th>日期</th><th>金额</th><th>状态</th></tr></thead>
         <tbody>
           ${recentBookings.length === 0
             ? `<tr><td colspan="7"><div class="empty"><div class="empty-icon">📭</div><div class="empty-text">暂无预约</div></div></td></tr>`
@@ -423,9 +446,9 @@ function renderDashboard() {
             <tr>
               <td>${b.name}</td>
               <td style="color:var(--gray3)">${b.employee_id}</td>
-              <td>${b.gender==='female'?'女舱':'男舱'} #${b.pod_number} <span class="tag ${b.card_type}">${b.card_type==='weekly'?'周卡':'日卡'}</span></td>
+              <td>${b.gender==='female'?'女舱':'男舱'} ${String(b.pod_number).padStart(2,'0')}</td>
+              <td><span class="tag ${b.card_type}">${b.card_type==='weekly'?'周卡':'日卡'}</span></td>
               <td>${b.booking_date}</td>
-              <td>${b.time_slot}</td>
               <td>${b.is_free ? '<span class="badge free">免费</span>' : '¥'+(b.payment_amount||0)}</td>
               <td>${statusBadge(b.status)}</td>
             </tr>`).join('')}
@@ -433,6 +456,11 @@ function renderDashboard() {
       </table>
     </div>
   </div>`;
+}
+
+function shiftChart(delta) {
+  chartOffset = Math.max(0, chartOffset + delta);
+  renderPage();
 }
 
 // ============ PENDING ============
@@ -447,23 +475,24 @@ function renderPending() {
     <div class="card-head"><h3>待处理（${pending.length}）</h3></div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>提交时间</th><th>姓名</th><th>事业群</th><th>工号</th><th>区域/床位</th><th>日期</th><th>时段</th><th>金额</th><th>截图</th><th>操作</th></tr></thead>
+        <thead><tr><th>提交时间</th><th>姓名</th><th>工号</th><th>区域/床位</th><th>类型</th><th>日期</th><th>金额</th><th>截图</th><th>操作</th></tr></thead>
         <tbody>
           ${pending.length === 0
-            ? `<tr><td colspan="10"><div class="empty"><div class="empty-icon">✅</div><div class="empty-text">没有待确认的预约</div></div></td></tr>`
+            ? `<tr><td colspan="9"><div class="empty"><div class="empty-icon">✅</div><div class="empty-text">没有待确认的预约</div></div></td></tr>`
             : pending.map(b=>`
             <tr>
               <td style="color:var(--gray3);font-size:12px">${b.created_at?.slice(0,16).replace('T',' ')}</td>
               <td><strong>${b.name}</strong></td>
-              <td style="color:var(--gray3)">${b.department}</td>
               <td style="color:var(--gray3)">${b.employee_id}</td>
-              <td>${b.gender==='female'?'女舱':'男舱'} #${b.pod_number}</td>
+              <td>${b.gender==='female'?'女舱':'男舱'} ${String(b.pod_number).padStart(2,'0')}</td>
+              <td><span class="tag ${b.card_type}">${b.card_type==='weekly'?'周卡':'日卡'}</span></td>
               <td>${b.booking_date}</td>
-              <td>${b.time_slot}</td>
               <td><strong>¥${b.payment_amount||0}</strong></td>
-              <td>${b.payment_screenshot && b.payment_screenshot !== '已上传'
-                ? `<button class="btn btn-view" onclick="viewScreenshot('${b.id}')">查看</button>`
-                : `<span style="color:var(--gray4);font-size:12px">${b.payment_screenshot||'未上传'}</span>`}</td>
+              <td>
+                ${b.payment_screenshot
+                  ? `<button class="btn btn-view" onclick="viewScreenshot('${b.id}')">📷 查看</button>`
+                  : `<span style="color:var(--gray4);font-size:12px">未上传</span>`}
+              </td>
               <td style="display:flex;gap:6px;flex-wrap:wrap">
                 <button class="btn btn-confirm" onclick="confirmBooking('${b.id}')">✓ 确认</button>
                 <button class="btn btn-release" onclick="rejectBooking('${b.id}')">✗ 拒绝</button>
@@ -488,16 +517,17 @@ async function rejectBooking(id) {
 }
 
 // ============ ALL BOOKINGS ============
-let bookingFilter = { date: '', gender: '', status: '', search: '' };
+let bookingFilter = { date: '', gender: '', cardType: '', status: '', search: '' };
 
 function renderBookings() {
   let filtered = allBookings;
   if (bookingFilter.date) filtered = filtered.filter(b => b.booking_date === bookingFilter.date);
   if (bookingFilter.gender) filtered = filtered.filter(b => b.gender === bookingFilter.gender);
+  if (bookingFilter.cardType) filtered = filtered.filter(b => b.card_type === bookingFilter.cardType);
   if (bookingFilter.status) filtered = filtered.filter(b => b.status === bookingFilter.status);
   if (bookingFilter.search) {
     const s = bookingFilter.search.toLowerCase();
-    filtered = filtered.filter(b => b.name?.includes(s) || b.employee_id?.includes(s) || b.department?.includes(s));
+    filtered = filtered.filter(b => b.name?.includes(s) || b.employee_id?.includes(s));
   }
   const todayRevenue = filtered.filter(b=>b.status==='confirmed'&&!b.is_free).reduce((s,b)=>s+(b.payment_amount||0),0);
   return `
@@ -513,6 +543,11 @@ function renderBookings() {
         <option value="female" ${bookingFilter.gender==='female'?'selected':''}>女舱</option>
         <option value="male" ${bookingFilter.gender==='male'?'selected':''}>男舱</option>
       </select>
+      <select class="filter-input" onchange="bookingFilter.cardType=this.value;renderPage()">
+        <option value="">日卡+周卡</option>
+        <option value="daily" ${bookingFilter.cardType==='daily'?'selected':''}>日卡</option>
+        <option value="weekly" ${bookingFilter.cardType==='weekly'?'selected':''}>周卡</option>
+      </select>
       <select class="filter-input" id="fStatus" onchange="bookingFilter.status=this.value;renderPage()">
         <option value="">全部状态</option>
         <option value="pending" ${bookingFilter.status==='pending'?'selected':''}>待确认</option>
@@ -520,25 +555,24 @@ function renderBookings() {
         <option value="released" ${bookingFilter.status==='released'?'selected':''}>已释放</option>
       </select>
       <input class="filter-input" id="fSearch" value="${bookingFilter.search}" placeholder="搜索姓名/工号" oninput="bookingFilter.search=this.value;renderPage()">
-      <button class="filter-btn secondary" onclick="bookingFilter={date:'',gender:'',status:'',search:''};renderPage()">清除</button>
-      <button class="filter-btn" onclick="exportCSV(filtered_bookings)">导出 CSV</button>
+      <button class="filter-btn secondary" onclick="bookingFilter={date:'',gender:'',cardType:'',status:'',search:''};renderPage()">清除</button>
+      <button class="filter-btn" onclick="exportCSV()">导出 CSV</button>
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>日期</th><th>时段</th><th>姓名</th><th>事业群</th><th>工号</th><th>区域/床位</th><th>类型</th><th>金额</th><th>状态</th><th>操作</th></tr></thead>
+        <thead><tr><th>日期</th><th>姓名</th><th>工号</th><th>区域/床位</th><th>类型</th><th>金额</th><th>截图</th><th>状态</th><th>操作</th></tr></thead>
         <tbody>
           ${filtered.length === 0
-            ? `<tr><td colspan="10"><div class="empty"><div class="empty-icon">📭</div><div class="empty-text">没有符合条件的预约</div></div></td></tr>`
+            ? `<tr><td colspan="9"><div class="empty"><div class="empty-icon">📭</div><div class="empty-text">没有符合条件的预约</div></div></td></tr>`
             : filtered.map(b=>`
             <tr>
               <td>${b.booking_date}</td>
-              <td style="white-space:nowrap">${b.time_slot}</td>
               <td><strong>${b.name}</strong></td>
-              <td style="color:var(--gray3)">${b.department}</td>
               <td style="color:var(--gray3)">${b.employee_id}</td>
-              <td>${b.gender==='female'?'女舱':'男舱'} #${b.pod_number}</td>
+              <td>${b.gender==='female'?'女舱':'男舱'} ${String(b.pod_number).padStart(2,'0')}</td>
               <td><span class="tag ${b.card_type}">${b.card_type==='weekly'?'周卡':'日卡'}</span></td>
               <td>${b.is_free ? '<span class="badge free">免费</span>' : '¥'+(b.payment_amount||0)}</td>
+              <td>${b.payment_screenshot ? `<button class="btn btn-view" onclick="viewScreenshot('${b.id}')">📷</button>` : '<span style="color:var(--gray4);font-size:11px">无</span>'}</td>
               <td>${statusBadge(b.status)}</td>
               <td>
                 ${b.status==='confirmed' ? `<button class="btn btn-release" onclick="releasePod('${b.id}')">释放</button>` : ''}
@@ -565,19 +599,27 @@ function exportCSV() {
   let filtered = allBookings;
   if (bookingFilter.date) filtered = filtered.filter(b => b.booking_date === bookingFilter.date);
   if (bookingFilter.gender) filtered = filtered.filter(b => b.gender === bookingFilter.gender);
+  if (bookingFilter.cardType) filtered = filtered.filter(b => b.card_type === bookingFilter.cardType);
   if (bookingFilter.status) filtered = filtered.filter(b => b.status === bookingFilter.status);
   if (bookingFilter.search) {
     const s = bookingFilter.search.toLowerCase();
     filtered = filtered.filter(b => b.name?.includes(s) || b.employee_id?.includes(s));
   }
-  const header = '日期,时段,姓名,事业群,工号,区域,床位,卡类型,金额,是否免费,状态,提交时间';
+  const header = '日期,姓名,工号,区域,床位,卡类型,金额,是否免费,状态,提交时间';
   const rows = filtered.map(b =>
-    [b.booking_date,b.time_slot,b.name,b.department,b.employee_id,b.gender==='female'?'女舱':'男舱',b.pod_number,b.card_type==='weekly'?'周卡':'日卡',b.payment_amount||0,b.is_free?'是':'否',b.status,b.created_at?.slice(0,16)].join(',')
+    [b.booking_date, b.name, b.employee_id,
+     b.gender==='female'?'女舱':'男舱',
+     String(b.pod_number).padStart(2,'0'),
+     b.card_type==='weekly'?'周卡':'日卡',
+     b.payment_amount||0, b.is_free?'是':'否',
+     b.status, b.created_at?.slice(0,16)].join(',')
   );
   const csv = [header,...rows].join('\n');
   const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=`预约记录_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  const a = document.createElement('a');
+  a.href=url; a.download=`睡眠舱预约_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
 }
 
 // ============ FREE BOOKING ============
@@ -590,48 +632,18 @@ function renderFreeBooking() {
   <div class="card">
     <div class="notice" style="margin:20px 20px 0">管理员预订自动确认，无需付款流程，直接生效。</div>
     <div class="form-row">
-      <div class="form-group">
-        <label>姓名</label>
-        <input id="fb-name" placeholder="员工姓名">
+      <div class="form-group"><label>姓名</label><input id="fb-name" placeholder="员工姓名"></div>
+      <div class="form-group"><label>工号</label><input id="fb-empid" placeholder="工号"></div>
+      <div class="form-group"><label>区域</label>
+        <select id="fb-gender"><option value="female">女舱</option><option value="male">男舱</option></select>
       </div>
-      <div class="form-group">
-        <label>工号</label>
-        <input id="fb-empid" placeholder="工号">
+      <div class="form-group"><label>卡类型</label>
+        <select id="fb-cardtype"><option value="daily">日卡</option><option value="weekly">周卡</option></select>
       </div>
-      <div class="form-group">
-        <label>事业群</label>
-        <select id="fb-dept">
-          <option value="">请选择</option>
-          ${DEPARTMENTS.map(d=>`<option value="${d}">${d}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>区域</label>
-        <select id="fb-gender">
-          <option value="female">女舱</option>
-          <option value="male">男舱</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>卡类型</label>
-        <select id="fb-cardtype">
-          <option value="daily">日卡</option>
-          <option value="weekly">周卡</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>床位号</label>
-        <input id="fb-pod" type="number" min="1" max="46" placeholder="床位号">
-      </div>
-      <div class="form-group">
-        <label>日期</label>
-        <input id="fb-date" type="date" value="${new Date().toISOString().slice(0,10)}">
-      </div>
-      <div class="form-group">
-        <label>时段</label>
-        <select id="fb-slot">
-          ${TIME_SLOTS.map(t=>`<option value="${t}">${t}</option>`).join('')}
-        </select>
+      <div class="form-group"><label>床位号</label><input id="fb-pod" type="number" min="1" max="46" placeholder="床位号"></div>
+      <div class="form-group"><label>日期</label><input id="fb-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+      <div class="form-group"><label>时段</label>
+        <select id="fb-slot"><option value="12:30–14:00">12:30–14:00</option></select>
       </div>
     </div>
     <div class="form-actions">
@@ -643,18 +655,17 @@ function renderFreeBooking() {
 async function submitFreeBooking() {
   const name = document.getElementById('fb-name').value.trim();
   const empId = document.getElementById('fb-empid').value.trim();
-  const dept = document.getElementById('fb-dept').value;
   const gender = document.getElementById('fb-gender').value;
   const cardType = document.getElementById('fb-cardtype').value;
   const podNum = parseInt(document.getElementById('fb-pod').value);
   const date = document.getElementById('fb-date').value;
   const slot = document.getElementById('fb-slot').value;
-  if (!name || !empId || !dept || !podNum || !date) { alert('请填写完整信息'); return; }
+  if (!name || !empId || !podNum || !date) { alert('请填写完整信息'); return; }
   const podObj = allPods.find(p => p.gender === gender && p.pod_number === podNum);
   try {
     await sbFetch('bookings', { method: 'POST', prefer: 'return=representation', body: JSON.stringify({
       pod_id: podObj?.id, gender, pod_number: podNum, card_type: cardType,
-      booking_date: date, time_slot: slot, name, department: dept, employee_id: empId,
+      booking_date: date, time_slot: slot, name, department: '', employee_id: empId,
       status: 'confirmed', is_free: true, payment_amount: 0, confirmed_at: new Date().toISOString()
     })});
     alert('✅ 免费预约创建成功！');
@@ -798,20 +809,37 @@ function statusBadge(status) {
   return `<span class="badge ${cls[status]||''}">${map[status]||status}</span>`;
 }
 
-function viewScreenshot(id) {
+async function viewScreenshot(id) {
   const b = allBookings.find(x => x.id === id);
   if (!b) return;
+  // Show modal immediately with loading state
   document.getElementById('modalBox').innerHTML = `
     <h3>付款截图 — ${b.name}</h3>
-    <p style="font-size:13px;color:var(--gray3);margin-bottom:12px">${b.booking_date} ${b.time_slot} · ¥${b.payment_amount}</p>
-    ${b.payment_screenshot && b.payment_screenshot !== '已上传'
-      ? `<img src="${b.payment_screenshot}" class="modal-img">`
-      : `<div style="background:var(--gray5);border-radius:8px;padding:40px;text-align:center;color:var(--gray3)">截图数据不可用</div>`}
-    <div class="modal-actions">
+    <p style="font-size:13px;color:var(--gray3);margin-bottom:12px">${b.booking_date} · ${b.gender==='female'?'女舱':'男舱'} ${String(b.pod_number).padStart(2,'0')} · <span class="tag ${b.card_type}">${b.card_type==='weekly'?'周卡':'日卡'}</span> · ¥${b.payment_amount}</p>
+    <div id="screenshotContent" style="background:var(--gray5);border-radius:8px;padding:40px;text-align:center;color:var(--gray3)">加载中…</div>
+    <div class="modal-actions" style="margin-top:16px">
       <button class="btn btn-confirm" style="flex:1;padding:10px" onclick="confirmBooking('${id}');closeModal()">✓ 确认收款</button>
       <button class="btn btn-release" style="flex:1;padding:10px" onclick="rejectBooking('${id}');closeModal()">✗ 拒绝</button>
     </div>`;
   document.getElementById('modalOverlay').style.display = 'flex';
+
+  // Fetch full booking record including screenshot data
+  try {
+    const rows = await sbFetch(`bookings?id=eq.${id}&select=payment_screenshot`);
+    const screenshot = rows?.[0]?.payment_screenshot;
+    const el = document.getElementById('screenshotContent');
+    if (!el) return;
+    if (screenshot && screenshot !== '已上传' && screenshot.startsWith('data:')) {
+      el.innerHTML = `<img src="${screenshot}" style="max-width:100%;border-radius:8px;display:block;">`;
+    } else if (screenshot === '已上传') {
+      el.innerHTML = `<div style="padding:20px;color:var(--gray3);font-size:13px">截图已标记上传，但图片数据未能存储（文件过大）。<br>请联系员工重新提交。</div>`;
+    } else {
+      el.innerHTML = `<div style="padding:20px;color:var(--gray3);font-size:13px">暂无截图</div>`;
+    }
+  } catch(e) {
+    const el = document.getElementById('screenshotContent');
+    if (el) el.innerHTML = `<div style="padding:20px;color:var(--gray3)">加载失败</div>`;
+  }
 }
 
 function closeModal(e) {
