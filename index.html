@@ -12,6 +12,7 @@
   --gold:#F0CE78;--gold-soft:rgba(240,206,120,0.15);
   --pink:#E88FAA;--pink-soft:rgba(232,143,170,0.15);
   --blue:#6BA4E8;--blue-soft:rgba(107,164,232,0.15);
+  --danger:#E87A7A;--danger-soft:rgba(232,122,122,0.12);
   --text:#EEF4FF;--text2:rgba(238,244,255,0.6);--text3:rgba(238,244,255,0.35);
   --r:20px;--r-sm:12px;--r-xs:8px;
 }
@@ -19,15 +20,12 @@
 html,body{min-height:100%;font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);}
 body{background:linear-gradient(180deg,#0d1829 0%,#0f2035 50%,#0d1829 100%);min-height:100vh;}
 
-/* stars */
 .stars-wrap{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
 .star{position:absolute;border-radius:50%;background:white;animation:twinkle var(--t) ease-in-out infinite var(--d);}
 @keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.7}}
 
-/* layout */
 .page{position:relative;z-index:1;max-width:460px;margin:0 auto;padding:0 0 100px;}
 
-/* header */
 .hdr{background:rgba(13,24,41,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;}
 .hdr-icon{width:36px;height:36px;background:linear-gradient(135deg,#1e3a5f,#2a4a7a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
 .hdr-info{flex:1;}
@@ -35,20 +33,16 @@ body{background:linear-gradient(180deg,#0d1829 0%,#0f2035 50%,#0d1829 100%);min-
 .hdr-sub{font-size:11px;color:var(--text3);margin-top:1px;}
 .hdr-badge{font-size:10px;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:20px;white-space:nowrap;border:1px solid rgba(79,195,195,0.2);}
 
-/* top info bar */
 .info-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);}
 .info-bar-left{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
 .info-bar-right{font-size:11px;color:var(--accent);}
 
-/* hero banner */
 .hero{margin:16px;border-radius:var(--r);overflow:hidden;position:relative;background:linear-gradient(135deg,#1a3a5c 0%,#0f2a45 100%);padding:20px;min-height:130px;display:flex;align-items:center;gap:16px;}
-.hero-stars{position:absolute;inset:0;pointer-events:none;}
 .hero-moon{font-size:60px;line-height:1;flex-shrink:0;filter:drop-shadow(0 0 20px rgba(240,206,120,0.4));animation:float 3s ease-in-out infinite;}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .hero-text h2{font-size:22px;font-weight:800;margin-bottom:5px;}
 .hero-text p{font-size:12px;color:rgba(238,244,255,0.65);line-height:1.6;}
 
-/* progress */
 .prog-wrap{padding:0 20px;margin-bottom:4px;}
 .prog-bar{display:flex;gap:4px;height:3px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,0.06);margin-top:12px;}
 .prog-seg{height:100%;flex:1;background:rgba(255,255,255,0.06);transition:background 0.3s;}
@@ -59,30 +53,22 @@ body{background:linear-gradient(180deg,#0d1829 0%,#0f2035 50%,#0d1829 100%);min-
 .prog-label.active{color:var(--accent);}
 .prog-label.done{color:rgba(79,195,195,0.6);}
 
-/* section */
 .sec{padding:0 16px;margin-bottom:16px;}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .sec-title{font-size:14px;font-weight:600;color:var(--text);}
-.sec-link{font-size:12px;color:var(--accent);}
 
-/* gender cards */
 .gender-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .gender-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
 .gender-card:active{transform:scale(.97);}
 .gender-card.sel{border-color:var(--accent);background:var(--accent-soft);}
 .gender-card.sel-pink{border-color:var(--pink);background:var(--pink-soft);}
 .gender-illus{width:100%;height:64px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;position:relative;}
-/* Female SVG person + beds */
 .gender-name{font-size:15px;font-weight:700;}
 .gender-meta{font-size:11px;color:var(--text3);margin-top:2px;}
-.gender-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;margin-top:8px;}
-.tag-pink{background:var(--pink-soft);color:var(--pink);}
-.tag-blue{background:var(--blue-soft);color:var(--blue);}
 .g-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center;font-size:9px;color:#0d1829;}
 .gender-card.sel .g-check,.gender-card.sel-pink .g-check{display:flex;}
 .gender-card.sel-pink .g-check{background:var(--pink);}
 
-/* card type */
 .type-list{display:flex;flex-direction:column;gap:8px;}
 .type-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;position:relative;}
 .type-card:active{transform:scale(.98);}
@@ -102,60 +88,38 @@ body{background:linear-gradient(180deg,#0d1829 0%,#0f2035 50%,#0d1829 100%);min-
 .pill-off{background:rgba(255,255,255,0.06);color:var(--text3);}
 .type-arrow{color:var(--text3);font-size:14px;}
 
-/* bottom features */
 .feat-strip{display:flex;padding:12px 16px;gap:0;background:rgba(255,255,255,0.03);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
 .feat-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--text3);padding:6px 0;}
 .feat-item+.feat-item{border-left:1px solid var(--border);}
 .feat-ico{font-size:18px;}
 
-/* pods */
 .pods-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;}
 .pods-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
 .pod-leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text3);}
 .pod-leg-icon{width:16px;height:12px;border-radius:3px;}
-.pods-grid{display:grid;gap:5px;}
-.pods-grid.f{grid-template-columns:repeat(8,1fr);}
-.pods-grid.m{grid-template-columns:repeat(8,1fr);}
 
-/* ✅ Fix 7: Cute bed shape */
+/* 床位卡片：上下铺成对显示 */
+.bunk-pair{display:flex;flex-direction:column;gap:4px;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:5px;background:rgba(255,255,255,0.02);}
+.pods-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px;}
+
 .pod{
-  aspect-ratio:1;
-  position:relative;
-  cursor:pointer;
-  transition:all .15s;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:5px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.10);
+  position:relative;cursor:pointer;transition:all .15s;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  border-radius:7px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.10);
+  padding:6px 2px;min-height:44px;
 }
-.pod::before{
-  content:attr(data-num);
-  font-size:clamp(8px,2.2vw,11px);
-  line-height:1;
-  font-weight:600;
-  color:rgba(238,244,255,0.5);
-  transition:all .15s;
-  font-family:-apple-system,"PingFang SC",sans-serif;
-}
-.pod::after{
-  content:"🛏";
-  font-size:clamp(6px,1.8vw,9px);
-  position:absolute;
-  bottom:2px;
-  right:2px;
-  line-height:1;
-  opacity:0.4;
-}
+.pod-num{font-size:12px;font-weight:700;color:var(--text2);}
+.pod-bunk{font-size:8px;font-weight:600;padding:1px 5px;border-radius:8px;letter-spacing:0.3px;}
+.pod-bunk.upper{background:rgba(107,164,232,0.18);color:var(--blue);}
+.pod-bunk.lower{background:rgba(240,206,120,0.18);color:var(--gold);}
 .pod.weekly-type{border-style:dashed;border-color:rgba(79,195,195,0.35);}
-.pod:active:not(.pod-occ):not(.pod-locked){transform:scale(.88);}
+.pod:active:not(.pod-occ):not(.pod-locked){transform:scale(.92);}
 .pod.pod-sel{background:var(--accent);border-color:var(--accent);}
-.pod.pod-sel::before{color:#0d1829;font-weight:700;}
-.pod.pod-sel::after{opacity:0.6;}
-.pod.pod-occ{background:rgba(255,255,255,0.02);cursor:not-allowed;border-color:rgba(255,255,255,0.05);opacity:.5;}
-.pod.pod-occ::before{filter:grayscale(1) brightness(0.4);}
+.pod.pod-sel .pod-num{color:#0d1829;}
+.pod.pod-sel .pod-bunk{background:rgba(13,24,41,0.25);color:#0d1829;}
+.pod.pod-occ{background:rgba(255,255,255,0.02);cursor:not-allowed;border-color:rgba(255,255,255,0.05);opacity:.45;}
 .pod.pod-locked{opacity:.15;cursor:not-allowed;}
 
-/* calendar */
 .cal-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;}
 .cal-hd{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(79,195,195,0.07);}
 .cal-mo{font-size:15px;font-weight:700;}
@@ -173,20 +137,17 @@ body{background:linear-gradient(180deg,#0d1829 0%,#0f2035 50%,#0d1829 100%);min-
 .cd.we{color:rgba(240,206,120,0.65);}
 .cd.we.sel{color:#0d1829;}
 .cd.empty{cursor:default;}
-.cd.blocked{color:#E87A7A;opacity:.4;cursor:not-allowed;text-decoration:line-through;}
+.cd.blocked{color:var(--danger);opacity:.4;cursor:not-allowed;text-decoration:line-through;}
 
-/* week dates display */
 .week-dates-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px;}
 .wd-cell{background:var(--accent-soft);border:1px solid rgba(79,195,195,0.2);border-radius:var(--r-xs);padding:8px 4px;text-align:center;}
 .wd-dow{font-size:9px;color:var(--accent);font-weight:700;margin-bottom:3px;}
 .wd-date{font-size:12px;color:var(--text);font-weight:700;}
 
-/* time slot */
 .time-btn{background:var(--accent);border-radius:var(--r-sm);padding:16px;text-align:center;border:none;width:100%;}
 .time-btn-t{font-size:20px;font-weight:800;color:#0d1829;letter-spacing:-0.5px;}
 .time-btn-s{font-size:11px;color:rgba(13,24,41,0.65);margin-top:3px;}
 
-/* form */
 .form-g{margin-bottom:12px;}
 .form-l{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.3px;margin-bottom:6px;display:block;}
 .form-inp{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:var(--r-xs);padding:13px 15px;font-size:16px;color:var(--text);outline:none;-webkit-appearance:none;transition:border-color .15s;}
@@ -195,7 +156,6 @@ body{background:linear-gradient(180deg,#0d1829 0%,#0f2035 50%,#0d1829 100%);min-
 select.form-inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(238,244,255,0.3)'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
 select.form-inp option{background:#111f35;}
 
-/* summary */
 .summ{background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;}
 .summ-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;}
 .summ-row+.summ-row{border-top:1px solid rgba(255,255,255,0.05);}
@@ -204,7 +164,6 @@ select.form-inp option{background:#111f35;}
 .summ-row.tot .summ-l{font-size:15px;font-weight:700;color:var(--text);}
 .summ-row.tot .summ-v{font-size:20px;font-weight:900;color:var(--accent);}
 
-/* pay */
 .pay-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);padding:20px;text-align:center;margin-bottom:16px;}
 .pay-amt-label{font-size:11px;color:var(--text3);margin-bottom:4px;}
 .pay-amt{font-size:48px;font-weight:900;color:var(--accent);letter-spacing:-1px;line-height:1;margin-bottom:4px;}
@@ -216,7 +175,6 @@ select.form-inp option{background:#111f35;}
 .pay-note{font-size:11px;color:var(--text3);line-height:1.7;}
 .pay-note strong{color:var(--accent);}
 
-/* upload */
 .upload{border:2px dashed rgba(255,255,255,0.12);border-radius:var(--r-sm);padding:24px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,0.03);}
 .upload.filled{border-color:var(--accent);background:var(--accent-soft);}
 .upload:active{transform:scale(.98);}
@@ -226,12 +184,11 @@ select.form-inp option{background:#111f35;}
 #fi{display:none;}
 .uprev{max-width:100%;max-height:160px;border-radius:8px;margin-top:12px;display:block;margin-left:auto;margin-right:auto;}
 
-/* notice */
 .notice{border-radius:var(--r-xs);padding:10px 14px;font-size:12px;line-height:1.6;margin-bottom:12px;}
 .ni{background:var(--accent-soft);color:var(--accent);border:1px solid rgba(79,195,195,0.2);}
 .nw{background:var(--gold-soft);color:var(--gold);border:1px solid rgba(240,206,120,0.2);}
+.nd{background:var(--danger-soft);color:var(--danger);border:1px solid rgba(232,122,122,0.25);}
 
-/* bottom bar */
 .bbar{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(13,24,41,0.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom));}
 .bbar-inner{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:6px;}
 .bbar-hint{text-align:center;font-size:11px;color:var(--text3);}
@@ -243,7 +200,6 @@ select.form-inp option{background:#111f35;}
 .btn-nxt .arrow{width:26px;height:26px;background:rgba(13,24,41,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;}
 .btn-nxt:disabled .arrow{display:none;}
 
-/* success */
 .suc-wrap{text-align:center;padding:30px 0 40px;}
 .suc-anim{font-size:60px;animation:pop .4s cubic-bezier(.34,1.56,.64,1);margin-bottom:16px;}
 @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
@@ -266,7 +222,20 @@ select.form-inp option{background:#111f35;}
 @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 .toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:rgba(13,24,41,.96);border:1px solid var(--border);color:var(--text);padding:9px 18px;border-radius:24px;font-size:12px;z-index:999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(10px);max-width:90vw;text-overflow:ellipsis;overflow:hidden;}
 .toast.show{opacity:1;}
-@media(max-width:360px){.pod::before{font-size:10px;}.pods-grid{gap:3px;}}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:#111f35;border:1px solid var(--border);border-radius:16px;padding:22px;max-width:380px;width:100%;max-height:85vh;overflow-y:auto;}
+.modal-icon{font-size:32px;text-align:center;margin-bottom:10px;}
+.modal-title{font-size:17px;font-weight:700;text-align:center;margin-bottom:14px;}
+.modal-body{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:18px;}
+.modal-body p{margin-bottom:10px;}
+.modal-body p:last-child{margin-bottom:0;}
+.modal-btn{width:100%;background:var(--accent);color:#0d1829;border:none;border-radius:var(--r-xs);padding:13px;font-size:15px;font-weight:700;cursor:pointer;}
+.modal-btn.secondary{background:rgba(255,255,255,0.08);color:var(--text2);margin-top:8px;}
+
+@media(max-width:360px){.content{padding:16px 12px 110px;}.pods-grid{grid-template-columns:repeat(auto-fill,minmax(48px,1fr));}}
 </style>
 </head>
 <body>
@@ -283,7 +252,7 @@ select.form-inp option{background:#111f35;}
   </div>
 
   <div class="info-bar">
-    <div class="info-bar-left">⏰ 工作日 12:30 – 14:00</div>
+    <div class="info-bar-left" id="infoBarLeft">⏰ 工作日 12:30 – 14:00</div>
     <div class="info-bar-right">预约后付款生效</div>
   </div>
 
@@ -305,6 +274,29 @@ select.form-inp option{background:#111f35;}
 
 <div class="toast" id="toast"></div>
 
+<!-- 黑名单提示弹窗 -->
+<div class="modal-overlay" id="blacklistModal">
+  <div class="modal-box">
+    <div class="modal-icon">⛔</div>
+    <div class="modal-title">预约权限受限</div>
+    <div class="modal-body" id="blacklistMsg">您的预约权限已被暂停，如有疑问请联系行政。</div>
+    <button class="modal-btn secondary" onclick="window.history.back()">返回</button>
+  </div>
+</div>
+
+<!-- 确认预约后的温馨提示弹窗 -->
+<div class="modal-overlay" id="confirmNoticeModal">
+  <div class="modal-box">
+    <div class="modal-icon">🌙</div>
+    <div class="modal-title">温馨提示</div>
+    <div class="modal-body">
+      <p>① 睡眠舱开放时段：<strong style="color:var(--accent)">12:30–14:00</strong>，14点统一消杀保洁，离场请收好个人随身物品。</p>
+      <p>② 请按照预约舱位使用，勿占用他人床位；违规占用累计 2 次，暂停当月预约权限。</p>
+    </div>
+    <button class="modal-btn" onclick="closeConfirmNotice()">我已知晓，继续</button>
+  </div>
+</div>
+
 <script>
 const SUPA_URL='https://fbnofibcfpdcrhuaqvgh.supabase.co';
 const SUPA_KEY='sb_publishable_jmaLdj9S1t06j-1F_dhl8Q_36cO36xc';
@@ -315,39 +307,47 @@ const DEPTS=['总经办','三七游戏-研发事业群','37手游','37网游事�
   '人力资源行政中心','战略管理中心','设计中心','产品合作中心',
   '轻悠部落','神鞠工作室','火凤凰','妙小程'];
 
-// ── Dynamic settings (loaded from DB) ──
-let CFG = {
-  use_start: '12:30',
-  use_end: '14:00',
-  daily_book_start: '09:00',
-  daily_book_end: '14:00',
-  weekly_book_day: '4',
-  weekly_book_start: '09:00',
-  weekly_book_close_day: '1',
-  weekly_book_close: '14:00'
-};
-let SLOT = '12:30–14:00'; // updated after settings load
+// ✅ 真实床位配置（含上下铺信息）
+const MALE_UPPER=[2,4,6,8,10,12,14,16,19,21,23,25,27,30,32,34,36,38,40,42,44,46,48];
+const MALE_LOWER=[1,3,5,7,9,11,13,15,20,22,24,26,28,29,31,33,35,37,39,41,43,45,47];
+const FEMALE_UPPER=[52,50,55,53,62,60,58,18];
+const FEMALE_LOWER=[51,49,56,54,61,59,57,17];
 
-async function loadSettings() {
-  try {
-    const rows = await sb('settings?select=key,value');
-    if (rows && rows.length) {
-      rows.forEach(r => { CFG[r.key] = r.value; });
-    }
-    SLOT = `${CFG.use_start}–${CFG.use_end}`;
-  } catch(e) { /* use defaults */ }
+function getBedList(gender){
+  const upper=gender==='female'?FEMALE_UPPER:MALE_UPPER;
+  const lower=gender==='female'?FEMALE_LOWER:MALE_LOWER;
+  const all=[...upper,...lower].sort((a,b)=>a-b);
+  return all.map(num=>({number:num,bunk:upper.includes(num)?'upper':'lower'}));
 }
-
-function toMins(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
 
 let S={
   step:1,gender:null,cardType:null,pod:null,
   date:null,weekDates:[],
-  name:'',dept:'',empId:'',
+  name:'',empId:'',nickname:'',
   screenshot:null,orderId:null,
   allPods:[],blocked:new Set(),bookedPods:new Set(),
   calY:new Date().getFullYear(),calM:new Date().getMonth()
 };
+
+// ── Dynamic settings ──
+let CFG={
+  use_start:'12:30',use_end:'14:00',
+  daily_book_start:'09:00',daily_book_end:'14:00',
+  weekly_book_day:'4',weekly_book_start:'09:00',
+  weekly_book_close_day:'1',weekly_book_close:'14:00',
+  weekly_days:'5',
+  blacklist_notice:'您的预约权限已被暂停，如有疑问请联系行政。'
+};
+let SLOT='12:30–14:00';
+
+async function loadSettings(){
+  try{
+    const rows=await sb('settings?select=key,value');
+    if(rows&&rows.length) rows.forEach(r=>{CFG[r.key]=r.value;});
+    SLOT=`${CFG.use_start}–${CFG.use_end}`;
+  }catch(e){}
+}
+function toMins(t){const [h,m]=t.split(':').map(Number);return h*60+m;}
 
 // ── stars ──
 (function(){
@@ -372,49 +372,45 @@ async function sb(path,opts={}){
   try{return JSON.parse(txt);}catch{return null;}
 }
 
-// ── booking open rules (uses DB settings) ──
+// ── booking open rules ──
 function isOpen(type){
   const now=new Date(),mins=now.getHours()*60+now.getMinutes(),dow=now.getDay();
   if(type==='daily'){
-    return mins>=toMins(CFG.daily_book_start) && mins<toMins(CFG.daily_book_end);
+    return mins>=toMins(CFG.daily_book_start)&&mins<toMins(CFG.daily_book_end);
   }
   if(type==='weekly'){
-    const openDay=parseInt(CFG.weekly_book_day);     // e.g. 4=Thu
-    const closeDay=parseInt(CFG.weekly_book_close_day); // e.g. 1=Mon
-    const openOk  = dow===openDay && mins>=toMins(CFG.weekly_book_start);
-    const closeOk = dow===closeDay && mins<toMins(CFG.weekly_book_close);
-    // open: from openDay to closeDay (spanning weekend)
-    const betweenDays = dow>openDay || dow<closeDay || (dow===0); // Fri/Sat/Sun
-    return openOk || betweenDays || closeOk;
+    const openDay=parseInt(CFG.weekly_book_day);
+    const closeDay=parseInt(CFG.weekly_book_close_day);
+    const openOk=dow===openDay&&mins>=toMins(CFG.weekly_book_start);
+    const closeOk=dow===closeDay&&mins<toMins(CFG.weekly_book_close);
+    const betweenDays=dow>openDay||dow<closeDay||(dow===0);
+    return openOk||betweenDays||closeOk;
   }
   return false;
 }
 
-// ✅ Fix 1: 只显示当前可预订那一周
 function getThisWeekDates(){
+  const days=parseInt(CFG.weekly_days)||5;
   const now=new Date(),dow=now.getDay();
   let mon=new Date(now);
-  // Thu~Sun: book next week; Mon(before 14:00): book this week
-  if(dow===1&&(now.getHours()*60+now.getMinutes())<14*60){
+  if(dow===1&&(now.getHours()*60+now.getMinutes())<toMins(CFG.weekly_book_close)){
     mon.setDate(now.getDate());
   } else if(dow===4||dow===5||dow===6||dow===0){
     const d=(8-dow)%7||7; mon.setDate(now.getDate()+d);
   } else {
     const d=(8-dow)%7; mon.setDate(now.getDate()+d);
   }
-  return Array.from({length:5},(_,i)=>{
+  return Array.from({length:days},(_,i)=>{
     const d=new Date(mon);d.setDate(mon.getDate()+i);
     return d.toISOString().slice(0,10);
   });
 }
 
-// ✅ Fix 1: 日卡只显示当周剩余工作日
 function getThisWeekDailyDates(){
   const now=new Date();
   const today=now.toISOString().slice(0,10);
   const nowMins=now.getHours()*60+now.getMinutes();
   const dates=[];
-  // find Monday of current week
   const dow=now.getDay();
   const mon=new Date(now);
   mon.setDate(now.getDate()-(dow===0?6:dow-1));
@@ -429,47 +425,67 @@ function getThisWeekDailyDates(){
   return dates;
 }
 
-// ── image compress（多轮压缩，确保 < 800KB）──
-const MAX_BYTES = 800 * 1024;
-
-function resizeEncode(img, maxW, quality) {
-  const scale = Math.min(1, maxW / img.width);
-  const w = Math.round(img.width * scale);
-  const h = Math.round(img.height * scale);
-  const c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  c.getContext('2d').drawImage(img, 0, 0, w, h);
-  return c.toDataURL('image/jpeg', quality);
+// ── image compress ──
+const MAX_BYTES=800*1024;
+function resizeEncode(img,maxW,quality){
+  const scale=Math.min(1,maxW/img.width);
+  const w=Math.round(img.width*scale),h=Math.round(img.height*scale);
+  const c=document.createElement('canvas');
+  c.width=w;c.height=h;
+  c.getContext('2d').drawImage(img,0,0,w,h);
+  return c.toDataURL('image/jpeg',quality);
 }
-
-function compress(dataUrl) {
-  return new Promise(res => {
-    const img = new Image();
-    img.onerror = () => res(dataUrl);
-    img.onload = () => {
-      const widths    = [1200, 900, 700, 500, 380];
-      const qualities = [0.75, 0.6, 0.45, 0.3, 0.18];
-      let smallest = null;
-      for (const maxW of widths) {
-        for (const q of qualities) {
-          const candidate = resizeEncode(img, maxW, q);
-          if (!smallest || candidate.length < smallest.length) smallest = candidate;
-          // base64 length * 0.75 ≈ bytes
-          if (candidate.length * 0.75 < MAX_BYTES) {
-            res(candidate);
-            return;
-          }
+function compress(dataUrl){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onerror=()=>res(dataUrl);
+    img.onload=()=>{
+      const widths=[1200,900,700,500,380];
+      const qualities=[0.75,0.6,0.45,0.3,0.18];
+      let smallest=null;
+      for(const maxW of widths){
+        for(const q of qualities){
+          const candidate=resizeEncode(img,maxW,q);
+          if(!smallest||candidate.length<smallest.length) smallest=candidate;
+          if(candidate.length*0.75<MAX_BYTES){res(candidate);return;}
         }
       }
-      res(smallest || dataUrl);
+      res(smallest||dataUrl);
     };
-    img.src = dataUrl;
+    img.src=dataUrl;
   });
 }
 
 // ── saved user ──
 function sv(){try{return JSON.parse(localStorage.getItem('spUser')||'{}');}catch{return{};}}
-function saveU(n,e){localStorage.setItem('spUser',JSON.stringify({name:n,empId:e}));}
+function saveU(n,e,d){localStorage.setItem('spUser',JSON.stringify({name:n,empId:e,dept:d}));}
+
+// ── 黑名单检查 ──
+async function checkBlacklist(){
+  const saved=sv();
+  if(!saved.name) return false;
+  try{
+    const rows=await sb(`blacklist?name=eq.${encodeURIComponent(saved.name)}&select=id,reason`);
+    if(rows&&rows.length>0){
+      document.getElementById('blacklistMsg').textContent=CFG.blacklist_notice;
+      document.getElementById('blacklistModal').classList.add('show');
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+// ── 同姓名当天只能预约一次 ──
+async function checkDuplicateToday(name, date){
+  try{
+    const rows=await sb(`bookings?name=eq.${encodeURIComponent(name)}&booking_date=eq.${date}&status=in.(pending,confirmed)&select=id`);
+    return rows && rows.length > 0;
+  }catch(e){ return false; }
+}
+
+function closeConfirmNotice(){
+  document.getElementById('confirmNoticeModal').classList.remove('show');
+}
 
 // ── render ──
 function render(){
@@ -492,8 +508,6 @@ function updateBbar(){
   document.getElementById('bbar').style.display=S.step===6?'none':'block';
   nx.disabled=true;
   document.getElementById('btnTxt').textContent=S.step===5?'确认预约':'下一步';
-
-  // step hints
   const hints={1:'选择区域与类型后继续',2:'选择你的床位',3:'确认预约时间',4:'填写个人信息',5:'付款并上传截图'};
   document.getElementById('bbarHint').textContent=hints[S.step]||'';
 }
@@ -503,6 +517,8 @@ function nxt(ok){const b=document.getElementById('btnNxt');if(b)b.disabled=!ok;}
 // ── Step 1 ──
 function s1(){
   const dO=isOpen('daily'),wO=isOpen('weekly');
+  const weeklyDays=parseInt(CFG.weekly_days)||5;
+  const weeklyPrice=weeklyDays*8;
   return `
   <div class="hero" style="margin:12px 16px 0;">
     <div class="hero-moon">🌙</div>
@@ -546,7 +562,7 @@ function s1(){
         <div class="type-icon icon-day">📅</div>
         <div class="type-body">
           <div class="type-name">日卡</div>
-          <div class="type-desc">单次使用 · 工作日当天 9:00 开放<br>14:00 截止预约</div>
+          <div class="type-desc">单次使用 · 工作日当天 ${CFG.daily_book_start} 开放<br>${CFG.daily_book_end} 截止预约</div>
           <div class="type-price">¥10 <small>/次</small></div>
         </div>
         <span class="type-pill ${dO?'pill-open':'pill-off'}">${dO?'现在可订':'暂未开放'}</span>
@@ -556,8 +572,8 @@ function s1(){
         <div class="type-icon icon-week">📆</div>
         <div class="type-body">
           <div class="type-name">周卡</div>
-          <div class="type-desc">一次预订整周 · 周一至周五（工作日）<br>上周四 9:00 开放</div>
-          <div class="type-price">¥40 <small>/周</small></div>
+          <div class="type-desc">一次预订 ${weeklyDays} 天 · 自动顺延工作日<br>周${dayNameOf(CFG.weekly_book_day)} ${CFG.weekly_book_start} 开放</div>
+          <div class="type-price">¥${weeklyPrice} <small>/${weeklyDays}天</small></div>
         </div>
         <span class="type-pill ${wO?'pill-gold':'pill-off'}">${wO?'8折':'暂未开放'}</span>
         ${wO?'<span class="type-arrow">›</span>':''}
@@ -572,6 +588,8 @@ function s1(){
   </div>`;
 }
 
+function dayNameOf(n){return ['日','一','二','三','四','五','六'][parseInt(n)]||n;}
+
 function femaleSvg(){return `<svg viewBox="0 0 90 64" width="90" height="64" fill="none">
   <rect x="8" y="22" width="74" height="36" rx="10" fill="rgba(232,143,170,0.12)" stroke="rgba(232,143,170,0.3)" stroke-width="1.2"/>
   <rect x="12" y="26" width="32" height="28" rx="7" fill="rgba(232,143,170,0.18)" stroke="rgba(232,143,170,0.4)" stroke-width="1"/>
@@ -579,13 +597,8 @@ function femaleSvg(){return `<svg viewBox="0 0 90 64" width="90" height="64" fil
   <rect x="14" y="28" width="28" height="8" rx="4" fill="rgba(232,143,170,0.3)"/>
   <rect x="50" y="28" width="28" height="8" rx="4" fill="rgba(232,143,170,0.2)"/>
   <circle cx="28" cy="14" r="9" fill="rgba(232,143,170,0.25)" stroke="rgba(232,143,170,0.5)" stroke-width="1.5"/>
-  <path d="M24 14 Q28 10 32 14" stroke="rgba(232,143,170,0.8)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-  <path d="M24.5 13.5 C24 11 27 9 28 9 C29 9 32 11 31.5 13.5" stroke="rgba(232,143,170,0.6)" stroke-width="1" fill="rgba(232,143,170,0.1)"/>
   <circle cx="62" cy="14" r="9" fill="rgba(232,143,170,0.18)" stroke="rgba(232,143,170,0.35)" stroke-width="1.5"/>
-  <path d="M58 14 Q62 10 66 14" stroke="rgba(232,143,170,0.6)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
   <rect x="10" y="52" width="70" height="4" rx="2" fill="rgba(232,143,170,0.15)"/>
-  <rect x="16" y="38" width="12" height="2" rx="1" fill="rgba(255,255,255,0.1)"/>
-  <rect x="16" y="42" width="8" height="2" rx="1" fill="rgba(255,255,255,0.07)"/>
 </svg>`;}
 
 function maleSvg(){return `<svg viewBox="0 0 90 64" width="90" height="64" fill="none">
@@ -593,44 +606,56 @@ function maleSvg(){return `<svg viewBox="0 0 90 64" width="90" height="64" fill=
   <rect x="8" y="26" width="22" height="28" rx="6" fill="rgba(107,164,232,0.18)" stroke="rgba(107,164,232,0.35)" stroke-width="1"/>
   <rect x="34" y="26" width="22" height="28" rx="6" fill="rgba(107,164,232,0.14)" stroke="rgba(107,164,232,0.28)" stroke-width="1"/>
   <rect x="60" y="26" width="22" height="28" rx="6" fill="rgba(107,164,232,0.10)" stroke="rgba(107,164,232,0.22)" stroke-width="1"/>
-  <rect x="10" y="28" width="18" height="7" rx="3.5" fill="rgba(107,164,232,0.3)"/>
-  <rect x="36" y="28" width="18" height="7" rx="3.5" fill="rgba(107,164,232,0.22)"/>
-  <rect x="62" y="28" width="18" height="7" rx="3.5" fill="rgba(107,164,232,0.16)"/>
   <circle cx="19" cy="13" r="8" fill="rgba(107,164,232,0.22)" stroke="rgba(107,164,232,0.45)" stroke-width="1.5"/>
   <circle cx="45" cy="13" r="8" fill="rgba(107,164,232,0.17)" stroke="rgba(107,164,232,0.35)" stroke-width="1.5"/>
   <circle cx="71" cy="13" r="8" fill="rgba(107,164,232,0.13)" stroke="rgba(107,164,232,0.28)" stroke-width="1.5"/>
   <rect x="6" y="52" width="78" height="4" rx="2" fill="rgba(107,164,232,0.12)"/>
 </svg>`;}
 
-// ── Step 2 ──
+// ── Step 2: 床位（含上下铺）──
 function s2(){
   const isFem=S.gender==='female';
-  const total=isFem?16:46, wkStart=isFem?9:24;
+  const beds=getBedList(S.gender); // [{number,bunk}]
   const maint=new Set(S.allPods.filter(p=>p.gender===S.gender&&!p.is_active).map(p=>p.pod_number));
   const booked=S.bookedPods;
+  const weeklyThreshold = isFem ? 9 : 24; // 用于兼容原card_type区分逻辑（按数量分组）
+
+  // 区分日卡/周卡床位：用 allPods 表里的 card_type 字段（如果有维护），否则按原顺序前半/后半
+  const podMeta={};
+  S.allPods.filter(p=>p.gender===S.gender).forEach(p=>{ podMeta[p.pod_number]=p.card_type; });
+
   let cells='';
-  for(let i=1;i<=total;i++){
-    const isW=i>=wkStart,myType=(S.cardType==='weekly')===isW;
-    const occ=maint.has(i)||booked.has(i),locked=!myType,sel=S.pod===i;
-    const numStr=String(i).padStart(2,'0');
-    cells+=`<div class="pod${isW?' weekly-type':''}${locked?' pod-locked':occ?' pod-occ':sel?' pod-sel':''}" ${(!locked&&!occ)?`onclick="pickPod(${i})"`:''} title="${isW?'周卡':'日卡'}床位 #${numStr}" data-num="${numStr}"></div>`;
-  }
-  const count=total - [...maint].filter(n=>{const isW=n>=wkStart;return(S.cardType==='weekly')===isW;}).length - [...booked].size;
+  beds.forEach(bed=>{
+    const num=bed.number;
+    const metaType=podMeta[num]; // 'daily' | 'weekly' | undefined
+    const isW = metaType ? metaType==='weekly' : false;
+    const myType = metaType ? metaType===S.cardType : true; // 若无配置，默认都可选（兼容旧数据）
+    const occ=maint.has(num)||booked.has(num);
+    const locked=!myType;
+    const sel=S.pod===num;
+    const bunkLabel=bed.bunk==='upper'?'上铺':'下铺';
+    const cls='pod'+(isW?' weekly-type':'')+(locked?' pod-locked':occ?' pod-occ':sel?' pod-sel':'');
+    cells+=`<div class="${cls}" ${(!locked&&!occ)?`onclick="pickPod(${num})"`:''} title="床位${num} · ${bunkLabel}">
+      <span class="pod-num">${num}</span>
+      <span class="pod-bunk ${bed.bunk}">${bunkLabel}</span>
+    </div>`;
+  });
+
   return `
   <div class="prog-wrap">
     <div class="prog-bar"><div class="prog-seg done"></div><div class="prog-seg active"></div><div class="prog-seg"></div><div class="prog-seg"></div><div class="prog-seg"></div></div>
     <div class="prog-labels"><div class="prog-label done">区域</div><div class="prog-label active">床位</div><div class="prog-label">时间</div><div class="prog-label">信息</div><div class="prog-label">付款</div></div>
   </div>
   <div class="sec">
-    <div class="sec-head"><span class="sec-title">${S.gender==='female'?'女舱':'男舱'} · ${S.cardType==='weekly'?'周卡':'日卡'}床位</span><span style="font-size:11px;color:var(--text3)">可选 ${Math.max(0,count)} 个</span></div>
-    <div class="notice ni">${S.cardType==='weekly'?'虚线 = 周卡专属床位':'实线 = 日卡床位'} · 🛏️深色 = 已被预约（不可选）</div>
+    <div class="sec-head"><span class="sec-title">${isFem?'女舱':'男舱'} · ${S.cardType==='weekly'?'周卡':'日卡'}床位</span></div>
+    <div class="notice ni">🛏️ 蓝色标签=上铺　🟡 金色标签=下铺　深色格=已被预约</div>
     <div class="pods-wrap">
       <div class="pods-legend">
         <div class="pod-leg"><div class="pod-leg-icon" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)"></div>可选</div>
         <div class="pod-leg"><div class="pod-leg-icon" style="background:var(--accent);border:1px solid var(--accent)"></div>已选</div>
-        <div class="pod-leg"><div class="pod-leg-icon" style="background:rgba(255,255,255,0.02);opacity:.4"></div>已预约</div>
+        <div class="pod-leg"><div class="pod-leg-icon" style="background:rgba(255,255,255,0.02);opacity:.45"></div>已预约</div>
       </div>
-      <div class="pods-grid ${isFem?'f':'m'}">${cells}</div>
+      <div class="pods-grid">${cells}</div>
     </div>
   </div>`;
 }
@@ -640,21 +665,23 @@ function s3(){
   if(S.cardType==='weekly'){
     const wDs=getThisWeekDates();
     S.weekDates=wDs;S.date=wDs[0];
-    const dNames=['周一','周二','周三','周四','周五'];
+    const dNames=['周一','周二','周三','周四','周五','周六','周日'];
     return `
     <div class="prog-wrap">
       <div class="prog-bar"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg active"></div><div class="prog-seg"></div><div class="prog-seg"></div></div>
       <div class="prog-labels"><div class="prog-label done">区域</div><div class="prog-label done">床位</div><div class="prog-label active">时间</div><div class="prog-label">信息</div><div class="prog-label">付款</div></div>
     </div>
     <div class="sec">
-      <div class="notice ni">📅 周卡预约时间：以下 5 个工作日，每天 12:30–14:00</div>
-      <div class="sec-head"><span class="sec-title">本周预约日期</span></div>
-      <div class="week-dates-grid">${wDs.map((d,i)=>`<div class="wd-cell"><div class="wd-dow">${dNames[i]}</div><div class="wd-date">${d.slice(5).replace('-','/')}</div></div>`).join('')}</div>
+      <div class="notice ni">📅 周卡预约时间：以下 ${wDs.length} 天，每天 ${CFG.use_start}–${CFG.use_end}</div>
+      <div class="sec-head"><span class="sec-title">预约日期</span></div>
+      <div class="week-dates-grid" style="grid-template-columns:repeat(${wDs.length},1fr)">${wDs.map((d,i)=>{
+        const dow=new Date(d).getDay();
+        return `<div class="wd-cell"><div class="wd-dow">${dNames[dow===0?6:dow-1]}</div><div class="wd-date">${d.slice(5).replace('-','/')}</div></div>`;
+      }).join('')}</div>
       <div class="sec-title" style="margin-bottom:10px">使用时段</div>
-      <button class="time-btn"><div class="time-btn-t">12:30 – 14:00</div><div class="time-btn-s">工作日午休 · 5天</div></button>
+      <button class="time-btn"><div class="time-btn-t">${CFG.use_start} – ${CFG.use_end}</div><div class="time-btn-s">工作日午休 · ${wDs.length}天</div></button>
     </div>`;
   }
-  // ✅ Fix 1: 日卡只显示当周剩余可用工作日
   const avDates=getThisWeekDailyDates();
   if(avDates.length===0){
     return `<div class="sec"><div class="notice nw">本周工作日预约时间已截止，请下周再来 🌙</div></div>`;
@@ -667,45 +694,54 @@ function s3(){
     <div class="prog-labels"><div class="prog-label done">区域</div><div class="prog-label done">床位</div><div class="prog-label active">时间</div><div class="prog-label">信息</div><div class="prog-label">付款</div></div>
   </div>
   <div class="sec">
-    <div class="notice ni">📅 日卡预约时间：工作日当天 9:00 开放，14:00 截止</div>
+    <div class="notice ni">📅 日卡预约时间：工作日当天 ${CFG.daily_book_start} 开放，${CFG.daily_book_end} 截止</div>
     <div class="sec-head"><span class="sec-title">选择日期（本周）</span></div>
     <div class="week-dates-grid" style="grid-template-columns:repeat(${avDates.length},1fr)">
       ${avDates.map(d=>{
         const dObj=new Date(d);const dow=dObj.getDay();const isToday=d===today;
-        return`<div class="wd-cell ${S.date===d?'':''}" style="${S.date===d?'background:var(--accent);border-color:var(--accent)':''}" onclick="pickDate('${d}')">
-          <div class="wd-dow" style="${S.date===d?'color:#0d1829':''}">周${dNames[dow-1]}${isToday?' 今':''}  </div>
+        return`<div class="wd-cell" style="${S.date===d?'background:var(--accent);border-color:var(--accent)':''}" onclick="pickDate('${d}')">
+          <div class="wd-dow" style="${S.date===d?'color:#0d1829':''}">周${dNames[dow-1]}${isToday?' 今':''}</div>
           <div class="wd-date" style="${S.date===d?'color:#0d1829':''}">${d.slice(5).replace('-','/')}</div>
         </div>`;
       }).join('')}
     </div>
     ${S.date?`
     <div class="sec-title" style="margin-bottom:10px;margin-top:16px">使用时段</div>
-    <button class="time-btn"><div class="time-btn-t">12:30 – 14:00</div><div class="time-btn-s">工作日午休时段（90分钟）</div></button>`:''}
+    <button class="time-btn"><div class="time-btn-t">${CFG.use_start} – ${CFG.use_end}</div><div class="time-btn-s">工作日午休时段</div></button>`:''}
   </div>`;
 }
 
-// ── Step 4 ──
+// ── Step 4: 信息（事业群+姓名，周卡额外昵称）──
 function s4(){
   const saved=sv();
-  const name=S.name||saved.name||'',empId=S.empId||saved.empId||'';
-  const amount=S.cardType==='weekly'?40:10;
-  const dDisp=S.cardType==='weekly'?`${S.weekDates[0]} 至 ${S.weekDates[4]}（5个工作日）`:S.date;
-  const podNum=String(S.pod).padStart(2,'0');
+  const name=S.name||saved.name||'',dept=S.dept||saved.dept||'';
+  const amount=S.cardType==='weekly'?(parseInt(CFG.weekly_days)||5)*8:10;
+  const dDisp=S.cardType==='weekly'?`${S.weekDates[0]} 至 ${S.weekDates[S.weekDates.length-1]}（${S.weekDates.length}天）`:S.date;
+  const bedInfo=getBedList(S.gender).find(b=>b.number===S.pod);
+  const bunkLabel=bedInfo?(bedInfo.bunk==='upper'?'上铺':'下铺'):'';
   return `
   <div class="prog-wrap">
     <div class="prog-bar"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg active"></div><div class="prog-seg"></div></div>
     <div class="prog-labels"><div class="prog-label done">区域</div><div class="prog-label done">床位</div><div class="prog-label done">时间</div><div class="prog-label active">信息</div><div class="prog-label">付款</div></div>
   </div>
   <div class="sec">
-    ${(name||empId)?'<div class="notice ni">已自动填入上次信息，如有变化请修改</div>':''}
+    ${(name||dept)?'<div class="notice ni">已自动填入上次信息，如有变化请修改</div>':''}
+    <div class="form-g"><label class="form-l">事业群</label>
+      <select class="form-inp" id="fDept" onchange="chkForm()">
+        <option value="">请选择事业群</option>
+        ${DEPTS.map(d=>`<option value="${d}"${dept===d?' selected':''}>${d}</option>`).join('')}
+      </select>
+    </div>
     <div class="form-g"><label class="form-l">姓名</label><input class="form-inp" id="fN" value="${name}" placeholder="请输入真实姓名" oninput="chkForm()"></div>
-    <div class="form-g"><label class="form-l">工号</label><input class="form-inp" id="fE" value="${empId}" placeholder="请输入工号" oninput="chkForm()"></div>
+    ${S.cardType==='weekly'?`
+    <div class="form-g"><label class="form-l">昵称（周卡需填写）</label><input class="form-inp" id="fNick" value="${S.nickname||''}" placeholder="方便识别的昵称" oninput="chkForm()"></div>
+    `:''}
     <div class="summ" style="margin-top:16px">
       <div class="summ-row"><span class="summ-l">区域</span><span class="summ-v">${S.gender==='female'?'女舱':'男舱'}</span></div>
-      <div class="summ-row"><span class="summ-l">床位</span><span class="summ-v">床位 ${podNum}</span></div>
-      <div class="summ-row"><span class="summ-l">类型</span><span class="summ-v">${S.cardType==='weekly'?'周卡（5个工作日）':'日卡（单次）'}</span></div>
+      <div class="summ-row"><span class="summ-l">床位</span><span class="summ-v">${S.pod}号（${bunkLabel}）</span></div>
+      <div class="summ-row"><span class="summ-l">类型</span><span class="summ-v">${S.cardType==='weekly'?`周卡（${S.weekDates.length}天）`:'日卡（单次）'}</span></div>
       <div class="summ-row"><span class="summ-l">预约日期</span><span class="summ-v">${dDisp}</span></div>
-      <div class="summ-row"><span class="summ-l">使用时段</span><span class="summ-v">工作日 12:30–14:00</span></div>
+      <div class="summ-row"><span class="summ-l">使用时段</span><span class="summ-v">工作日 ${CFG.use_start}–${CFG.use_end}</span></div>
       <div class="summ-row tot"><span class="summ-l">应付金额</span><span class="summ-v">¥${amount}</span></div>
     </div>
   </div>`;
@@ -713,7 +749,7 @@ function s4(){
 
 // ── Step 5 ──
 function s5(){
-  const amount=S.cardType==='weekly'?40:10;
+  const amount=S.cardType==='weekly'?(parseInt(CFG.weekly_days)||5)*8:10;
   return `
   <div class="prog-wrap">
     <div class="prog-bar"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg active"></div></div>
@@ -723,12 +759,12 @@ function s5(){
     <div class="pay-card">
       <div class="pay-amt-label">应付金额</div>
       <div class="pay-amt">¥${amount}</div>
-      <div class="pay-amt-sub">${S.cardType==='weekly'?'5个工作日 × ¥8 = ¥40（8折）':'日卡单次使用'}</div>
-      <div class="pay-qr"><img src="${QR_B64}" alt="收款码" onerror="this.parentElement.innerHTML='<div style=padding:10px;text-align:center;font-size:11px;color:#888>收款码加载失败<br>请截图联系管理员</div>'"></div>
+      <div class="pay-amt-sub">${S.cardType==='weekly'?`${S.weekDates.length}天 × ¥8 = ¥${amount}（8折）`:'日卡单次使用'}</div>
+      <div class="pay-qr"><img src="${QR_B64}" alt="收款码"></div>
       <div class="pay-badges">
         <span class="pay-badge">支付宝</span><span class="pay-badge">银联</span><span class="pay-badge">云闪付</span><span class="pay-badge">数字人民币</span>
       </div>
-      <div class="pay-note">付款备注：<strong>${S.name} ${S.empId}</strong><br>支付完成后请上传付款截图</div>
+      <div class="pay-note">付款备注：<strong>${S.name} ${S.dept||''}</strong><br>支付完成后请上传付款截图</div>
     </div>
     <div class="upload ${S.screenshot?'filled':''}" onclick="document.getElementById('fi').click()">
       <input type="file" id="fi" accept="image/*" onchange="onFile(event)">
@@ -736,14 +772,15 @@ function s5(){
         ?`<div class="upload-ico">✅</div><div class="upload-t"><strong>截图已上传</strong><br>点击重新选择</div><img src="${S.screenshot}" class="uprev">`
         :`<div class="upload-ico">📸</div><div class="upload-t"><strong>点击上传付款截图</strong><br>支持 JPG、PNG</div>`}
     </div>
-    <div class="notice nw" style="margin-top:12px">⚠️ 上传截图后床位即刻锁定。管理员确认收款后预约正式生效。预约不可退订，请确认无误。</div>
+    <div class="notice nw" style="margin-top:12px">⚠️ 上传截图后床位即刻锁定。管理员确认收款后预约正式生效。</div>
+    <div class="notice nd">💰 缴费后费用不予退回，若有特殊事由，可通过【行政】行小葱服务号沟通咨询</div>
   </div>`;
 }
 
 // ── Step 6 ──
 function s6(){
-  const amount=S.cardType==='weekly'?40:10;
-  const dDisp=S.cardType==='weekly'?`${S.weekDates[0]} ~ ${S.weekDates[4]}（5个工作日）`:S.date;
+  const amount=S.cardType==='weekly'?(parseInt(CFG.weekly_days)||5)*8:10;
+  const dDisp=S.cardType==='weekly'?`${S.weekDates[0]} ~ ${S.weekDates[S.weekDates.length-1]}（${S.weekDates.length}天）`:S.date;
   return `
   <div class="sec">
   <div class="suc-wrap">
@@ -753,11 +790,11 @@ function s6(){
     <div class="ticket">
       <div class="tkt-id">订单号 ${S.orderId||'—'}</div>
       <div class="tkt-row"><span>姓名</span><span>${S.name}</span></div>
-      <div class="tkt-row"><span>工号</span><span>${S.empId}</span></div>
-      <div class="tkt-row"><span>区域/床位</span><span>${S.gender==='female'?'女舱':'男舱'} ${String(S.pod).padStart(2,'0')}</span></div>
+      <div class="tkt-row"><span>事业群</span><span>${S.dept||'—'}</span></div>
+      <div class="tkt-row"><span>区域/床位</span><span>${S.gender==='female'?'女舱':'男舱'} ${S.pod}号</span></div>
       <div class="tkt-row"><span>预约日期</span><span>${dDisp}</span></div>
-      <div class="tkt-row"><span>使用时段</span><span>工作日 12:30–14:00</span></div>
-      <div class="tkt-row"><span>类型</span><span>${S.cardType==='weekly'?'周卡（5天）':'日卡'}</span></div>
+      <div class="tkt-row"><span>使用时段</span><span>工作日 ${CFG.use_start}–${CFG.use_end}</span></div>
+      <div class="tkt-row"><span>类型</span><span>${S.cardType==='weekly'?`周卡（${S.weekDates.length}天）`:'日卡'}</span></div>
       <div class="tkt-row"><span>金额</span><span class="tkt-amt">¥${amount}</span></div>
     </div>
     <div class="pend-box">⏳ 床位已锁定，待管理员确认收款后预约正式生效。预约不支持退订。</div>
@@ -782,7 +819,6 @@ async function pickDate(d){
 
 async function loadBookedForDate(date){
   if(!date){S.bookedPods=new Set();return;}
-  // ✅ Fix 5&6: 查询 pending+confirmed，任何人预约了都算占位
   const rows=await sb(
     `bookings?booking_date=eq.${date}&status=in.(pending,confirmed)&gender=eq.${S.gender}&select=pod_number`
   ).catch(()=>[]);
@@ -791,9 +827,13 @@ async function loadBookedForDate(date){
 }
 
 function chkForm(){
+  S.dept=document.getElementById('fDept')?.value||S.dept;
   S.name=document.getElementById('fN')?.value.trim()||S.name;
-  S.empId=document.getElementById('fE')?.value.trim()||S.empId;
-  nxt(!!(S.name&&S.empId));
+  const nickEl=document.getElementById('fNick');
+  if(nickEl) S.nickname=nickEl.value.trim();
+  const needNick = S.cardType==='weekly';
+  const ok = !!(S.dept&&S.name) && (!needNick || !!S.nickname);
+  nxt(ok);
 }
 
 async function onFile(e){
@@ -814,23 +854,29 @@ async function goNext(){
     S.step=2;
     document.getElementById('app').innerHTML='<div class="loading">加载床位中 <span class="dot">•</span><span class="dot">•</span><span class="dot">•</span></div>';
     await loadBase();
-    // ✅ Fix 6: 加载时先查本日/本周已预约
-    if(S.cardType==='weekly'){
-      const wDs=getThisWeekDates();
-      await loadBookedForDate(wDs[0]);
-    }
     render();nxt(!!S.pod);
   } else if(S.step===2){
-    // ✅ Fix 6: 进入步骤3前重新检查占位
-    if(S.cardType==='daily'){S.bookedPods=new Set();}
     S.step=3;render();nxt(S.cardType==='weekly');
-  } else if(S.step===3){S.step=4;render();}
-  else if(S.step===4){saveU(S.name,S.empId);S.step=5;render();nxt(!!S.screenshot);}
+  } else if(S.step===3){
+    S.step=4;render();
+  } else if(S.step===4){
+    // ✅ 同姓名当天只能预约一次检查
+    const checkDate = S.cardType==='weekly' ? S.weekDates[0] : S.date;
+    const dup = await checkDuplicateToday(S.name, checkDate);
+    if(dup){
+      toast('您今天已有一条预约记录，每人每天限预约一次');
+      return;
+    }
+    saveU(S.name,S.empId,S.dept);
+    // ✅ 弹出温馨提示
+    document.getElementById('confirmNoticeModal').classList.add('show');
+    S.step=5;render();nxt(!!S.screenshot);
+  }
   else if(S.step===5){await submit();}
 }
 
 async function loadBase(){
-  await loadSettings(); // ← load settings first
+  await loadSettings();
   const [pods,bk]=await Promise.all([
     sb('pods?select=*&is_active=eq.true&order=pod_number.asc').catch(()=>[]),
     sb('blocked_dates?select=date').catch(()=>[])
@@ -839,37 +885,20 @@ async function loadBase(){
   S.blocked=new Set((bk||[]).map(d=>d.date));
 }
 
-async function uploadScreenshot(bookingId) {
-  if (!S.screenshot) return null;
-  try {
-    // 把 base64 转成 Blob
-    const res = await fetch(S.screenshot);
-    const blob = await res.blob();
-    const filename = `${bookingId}.jpg`;
-
-    // 上传到 Supabase Storage bucket: screenshots
-    const upRes = await fetch(
-      `${SUPA_URL}/storage/v1/object/screenshots/${filename}`,
-      {
-        method: 'POST',
-        headers: {
-          'apikey': SUPA_KEY,
-          'Authorization': 'Bearer ' + SUPA_KEY,
-          'Content-Type': 'image/jpeg',
-          'x-upsert': 'true'
-        },
-        body: blob
-      }
-    );
-    if (!upRes.ok) {
-      // storage上传失败，降级：把压缩后base64直接存（最多尝试一次）
-      return S.screenshot;
-    }
-    // 返回公开访问URL
+async function uploadScreenshot(bookingId){
+  if(!S.screenshot) return null;
+  try{
+    const res=await fetch(S.screenshot);
+    const blob=await res.blob();
+    const filename=`${bookingId}.jpg`;
+    const upRes=await fetch(`${SUPA_URL}/storage/v1/object/screenshots/${filename}`,{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'image/jpeg','x-upsert':'true'},
+      body:blob
+    });
+    if(!upRes.ok) return S.screenshot;
     return `${SUPA_URL}/storage/v1/object/public/screenshots/${filename}`;
-  } catch(e) {
-    return S.screenshot; // 降级返回base64
-  }
+  }catch(e){ return S.screenshot; }
 }
 
 async function submit(){
@@ -877,10 +906,9 @@ async function submit(){
   btn.disabled=true;document.getElementById('btnTxt').textContent='提交中…';
   try{
     const pod=S.allPods.find(p=>p.gender===S.gender&&p.pod_number===S.pod);
-    const amount=S.cardType==='weekly'?40:10;
+    const amount=S.cardType==='weekly'?(parseInt(CFG.weekly_days)||5)*8:10;
     const dateToSave=S.cardType==='weekly'?S.weekDates[0]:S.date;
 
-    // 先查是否已有重复记录
     const exist=await sb(
       `bookings?pod_id=eq.${pod?.id}&booking_date=eq.${dateToSave}&time_slot=eq.${encodeURIComponent(SLOT)}&status=in.(pending,confirmed)&select=id`
     ).catch(()=>[]);
@@ -890,14 +918,13 @@ async function submit(){
       return;
     }
 
-    // 先创建预约记录（不含截图），拿到 ID
     document.getElementById('btnTxt').textContent='提交中(1/2)…';
     const res=await sb('bookings',{
       method:'POST',prefer:'return=representation',
       body:JSON.stringify({
         pod_id:pod?.id,gender:S.gender,pod_number:S.pod,
         card_type:S.cardType,booking_date:dateToSave,time_slot:SLOT,
-        name:S.name,department:'',employee_id:S.empId,
+        name:S.name,department:S.dept||'',employee_id:S.nickname||'',
         status:'pending',is_free:false,payment_amount:amount,
         payment_screenshot:'上传中'
       })
@@ -905,14 +932,11 @@ async function submit(){
     const bookingId=res?.[0]?.id;
     S.orderId=bookingId||'N/A';
 
-    // 再上传截图（用 Storage，失败也不影响预约）
     if(S.screenshot&&bookingId){
       document.getElementById('btnTxt').textContent='上传截图(2/2)…';
       const screenshotUrl=await uploadScreenshot(bookingId);
-      // 更新截图字段
       await sb(`bookings?id=eq.${bookingId}`,{
-        method:'PATCH',
-        prefer:'return=minimal',
+        method:'PATCH',prefer:'return=minimal',
         body:JSON.stringify({payment_screenshot:screenshotUrl||'已上传'})
       }).catch(()=>{});
     }
@@ -933,7 +957,7 @@ async function submit(){
 function restart(){
   const base={allPods:S.allPods,blocked:S.blocked};
   S={step:1,gender:null,cardType:null,pod:null,date:null,weekDates:[],
-    name:'',dept:'',empId:'',screenshot:null,orderId:null,
+    name:'',empId:'',nickname:'',dept:'',screenshot:null,orderId:null,
     bookedPods:new Set(),calY:new Date().getFullYear(),calM:new Date().getMonth(),...base};
   document.getElementById('bbar').style.display='block';
   render();
@@ -944,13 +968,14 @@ function toast(msg){
   setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-// ── init: load settings then render ──
+// ── init ──
 (async function init(){
   await loadSettings();
   const badge=document.getElementById('hdrBadge');
   if(badge) badge.textContent=`工作日 ${CFG.use_start}–${CFG.use_end}`;
-  const infoL=document.querySelector('.info-bar-left');
+  const infoL=document.getElementById('infoBarLeft');
   if(infoL) infoL.innerHTML=`⏰ 工作日 ${CFG.use_start} – ${CFG.use_end}`;
+  const isBlacklisted = await checkBlacklist();
   render();
 })();
 </script>
