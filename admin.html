@@ -228,6 +228,7 @@
         <div class="nav-item" onclick="showPage('pods')" id="nav-pods">🛏️ 床位管理</div>
         <div class="nav-item" onclick="showPage('holidays')" id="nav-holidays">📅 节假日配置</div>
         <div class="nav-item" onclick="showPage('time-settings')" id="nav-time-settings">⏰ 时间配置</div>
+        <div class="nav-item" onclick="showPage('blacklist')" id="nav-blacklist">⛔ 黑名单管理</div>
       </div>
       <div class="sidebar-footer">
         <button class="logout-btn" onclick="doLogout()">退出登录</button>
@@ -325,6 +326,7 @@ async function renderPage() {
     case 'pods': c.innerHTML = renderPods(); break;
     case 'holidays': c.innerHTML = renderHolidays(); break;
     case 'time-settings': c.innerHTML = await renderTimeSettings(); break;
+    case 'blacklist': c.innerHTML = await renderBlacklist(); break;
   }
 }
 
@@ -625,6 +627,11 @@ function exportCSV() {
 }
 
 // ============ FREE BOOKING ============
+const DEPARTMENTS_FB = ['总经办','三七游戏-研发事业群','37手游','37网游事业群',
+  '37GAMES-海外发行事业群','财管与风控事业群','技术中心',
+  '人力资源行政中心','战略管理中心','设计中心','产品合作中心',
+  '轻悠部落','神鞠工作室','火凤凰','妙小程'];
+
 function renderFreeBooking() {
   return `
   <div class="page-header">
@@ -632,17 +639,23 @@ function renderFreeBooking() {
     <div class="page-sub">为员工直接创建预约，无需付款</div>
   </div>
   <div class="card">
-    <div class="notice" style="margin:20px 20px 0">管理员预订自动确认，无需付款流程，直接生效。</div>
+    <div class="notice" style="margin:20px 20px 0">管理员预订自动确认，无需付款流程，直接生效。选择周卡时需填写昵称。</div>
     <div class="form-row">
+      <div class="form-group"><label>事业群</label>
+        <select id="fb-dept">
+          <option value="">请选择</option>
+          ${DEPARTMENTS_FB.map(d=>`<option value="${d}">${d}</option>`).join('')}
+        </select>
+      </div>
       <div class="form-group"><label>姓名</label><input id="fb-name" placeholder="员工姓名"></div>
-      <div class="form-group"><label>工号</label><input id="fb-empid" placeholder="工号"></div>
       <div class="form-group"><label>区域</label>
         <select id="fb-gender"><option value="female">女舱</option><option value="male">男舱</option></select>
       </div>
       <div class="form-group"><label>卡类型</label>
-        <select id="fb-cardtype"><option value="daily">日卡</option><option value="weekly">周卡</option></select>
+        <select id="fb-cardtype" onchange="toggleFbNickname()"><option value="daily">日卡</option><option value="weekly">周卡</option></select>
       </div>
-      <div class="form-group"><label>床位号</label><input id="fb-pod" type="number" min="1" max="46" placeholder="床位号"></div>
+      <div class="form-group" id="fb-nickname-wrap" style="display:none"><label>昵称（周卡需填写）</label><input id="fb-nickname" placeholder="昵称"></div>
+      <div class="form-group"><label>床位号</label><input id="fb-pod" type="number" min="1" max="62" placeholder="床位号"></div>
       <div class="form-group"><label>日期</label><input id="fb-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
       <div class="form-group"><label>时段</label>
         <select id="fb-slot"><option value="12:30–14:00">12:30–14:00</option></select>
@@ -654,20 +667,27 @@ function renderFreeBooking() {
   </div>`;
 }
 
+function toggleFbNickname() {
+  const ct = document.getElementById('fb-cardtype').value;
+  document.getElementById('fb-nickname-wrap').style.display = ct === 'weekly' ? 'block' : 'none';
+}
+
 async function submitFreeBooking() {
+  const dept = document.getElementById('fb-dept').value;
   const name = document.getElementById('fb-name').value.trim();
-  const empId = document.getElementById('fb-empid').value.trim();
   const gender = document.getElementById('fb-gender').value;
   const cardType = document.getElementById('fb-cardtype').value;
+  const nickname = document.getElementById('fb-nickname')?.value.trim() || '';
   const podNum = parseInt(document.getElementById('fb-pod').value);
   const date = document.getElementById('fb-date').value;
   const slot = document.getElementById('fb-slot').value;
-  if (!name || !empId || !podNum || !date) { alert('请填写完整信息'); return; }
+  if (!dept || !name || !podNum || !date) { alert('请填写完整信息'); return; }
+  if (cardType === 'weekly' && !nickname) { alert('周卡预约需填写昵称'); return; }
   const podObj = allPods.find(p => p.gender === gender && p.pod_number === podNum);
   try {
     await sbFetch('bookings', { method: 'POST', prefer: 'return=representation', body: JSON.stringify({
       pod_id: podObj?.id, gender, pod_number: podNum, card_type: cardType,
-      booking_date: date, time_slot: slot, name, department: '', employee_id: empId,
+      booking_date: date, time_slot: slot, name, department: dept, employee_id: nickname,
       status: 'confirmed', is_free: true, payment_amount: 0, confirmed_at: new Date().toISOString()
     })});
     alert('✅ 免费预约创建成功！');
@@ -691,8 +711,10 @@ function renderPods() {
     const cls = isMaint ? 'maintenance' : isOcc ? 'occupied' : 'available';
     const weeklyClass = p.card_type === 'weekly' ? ' weekly-zone' : '';
     const label = isMaint ? '维修' : isOcc ? '使用中' : '可用';
-    return `<div class="pod-map-cell ${cls}${weeklyClass}" onclick="toggleMaintenance('${p.id}',${p.is_active})" title="${p.gender==='female'?'女':'男'}舱 #${p.pod_number} - 点击切换维修状态">
+    const typeLabel = p.card_type === 'weekly' ? '周' : '日';
+    return `<div class="pod-map-cell ${cls}${weeklyClass}" onclick="openPodEditor('${p.id}',${p.pod_number},'${p.gender}','${p.card_type}',${p.is_active})" title="${p.gender==='female'?'女':'男'}舱 #${p.pod_number} - 点击编辑">
       <div style="font-weight:600">${p.pod_number}</div>
+      <div style="font-size:8px;opacity:0.6">${typeLabel}卡</div>
       <div style="font-size:9px;opacity:0.7">${label}</div>
     </div>`;
   }
@@ -700,36 +722,63 @@ function renderPods() {
   return `
   <div class="page-header">
     <div class="page-title">床位管理</div>
-    <div class="page-sub">点击床位可切换维修状态；今日占用情况实时显示</div>
+    <div class="page-sub">点击床位可编辑：切换日卡/周卡属性、维修状态</div>
   </div>
   <div class="card">
     <div class="card-head"><h3>图例</h3></div>
     <div style="display:flex;gap:16px;padding:12px 20px;flex-wrap:wrap">
       <div style="display:flex;align-items:center;gap:8px;font-size:13px"><div style="width:16px;height:16px;border-radius:4px;background:var(--teal-light);border:1px solid #9FE1CB"></div>可用</div>
       <div style="display:flex;align-items:center;gap:8px;font-size:13px"><div style="width:16px;height:16px;border-radius:4px;background:var(--mist);border:1px solid #B8D4ED"></div>今日使用中</div>
-      <div style="display:flex;align-items:center;gap:8px;font-size:13px"><div style="width:16px;height:16px;border-radius:4px;background:var(--amber-light);border:1px solid #F0C99A"></div>维修中（点击恢复）</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px"><div style="width:16px;height:16px;border-radius:4px;background:var(--amber-light);border:1px solid #F0C99A"></div>维修中</div>
       <div style="display:flex;align-items:center;gap:8px;font-size:13px"><div style="width:16px;height:16px;border-radius:4px;border:1.5px dashed var(--sky)"></div>周卡专属</div>
     </div>
   </div>
   <div class="card">
-    <div class="card-head"><h3>女舱（${femalePods.filter(p=>p.is_active).length}/${femalePods.length} 可用）</h3></div>
+    <div class="card-head"><h3>女舱（${femalePods.filter(p=>p.is_active).length}/${femalePods.length} 可用 · ${femalePods.filter(p=>p.card_type==='daily').length}日卡/${femalePods.filter(p=>p.card_type==='weekly').length}周卡）</h3></div>
     <div class="pod-map">
       <div class="pod-map-grid female">${femalePods.map(podCell).join('')}</div>
     </div>
   </div>
   <div class="card">
-    <div class="card-head"><h3>男舱（${malePods.filter(p=>p.is_active).length}/${malePods.length} 可用）</h3></div>
+    <div class="card-head"><h3>男舱（${malePods.filter(p=>p.is_active).length}/${malePods.length} 可用 · ${malePods.filter(p=>p.card_type==='daily').length}日卡/${malePods.filter(p=>p.card_type==='weekly').length}周卡）</h3></div>
     <div class="pod-map">
       <div class="pod-map-grid male">${malePods.map(podCell).join('')}</div>
     </div>
   </div>`;
 }
 
-async function toggleMaintenance(id, currentlyActive) {
-  const msg = currentlyActive ? '将此床位标记为维修中？用户将无法预订。' : '恢复此床位为可用状态？';
-  if (!confirm(msg)) return;
-  await sbFetch(`pods?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ is_active: !currentlyActive }) });
-  await loadAll(); renderPage();
+function openPodEditor(id, podNum, gender, cardType, isActive) {
+  document.getElementById('modalBox').innerHTML = `
+    <h3>编辑床位 ${gender==='female'?'女舱':'男舱'} #${podNum}</h3>
+    <div style="margin:16px 0">
+      <label style="font-size:13px;color:var(--gray3);display:block;margin-bottom:6px">卡类型（日卡 ⇄ 周卡互换）</label>
+      <select id="podEditCardType" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px">
+        <option value="daily" ${cardType==='daily'?'selected':''}>日卡床位</option>
+        <option value="weekly" ${cardType==='weekly'?'selected':''}>周卡床位</option>
+      </select>
+    </div>
+    <div style="margin:16px 0">
+      <label style="font-size:13px;color:var(--gray3);display:block;margin-bottom:6px">维修状态</label>
+      <select id="podEditActive" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px">
+        <option value="true" ${isActive?'selected':''}>正常可用</option>
+        <option value="false" ${!isActive?'selected':''}>维修中（停用）</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-confirm" style="flex:1;padding:10px" onclick="savePodEdit('${id}')">✓ 保存</button>
+      <button class="btn btn-release" style="flex:1;padding:10px" onclick="closeModal()">取消</button>
+    </div>`;
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+async function savePodEdit(id) {
+  const cardType = document.getElementById('podEditCardType').value;
+  const isActive = document.getElementById('podEditActive').value === 'true';
+  try {
+    await sbFetch(`pods?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ card_type: cardType, is_active: isActive }) });
+    closeModal();
+    await loadAll(); renderPage();
+  } catch(e) { alert('保存失败：' + e.message); }
 }
 
 // ============ HOLIDAYS ============
@@ -804,6 +853,85 @@ async function removeBlockedDate(id) {
   await loadAll(); renderPage();
 }
 
+// ============ BLACKLIST ============
+let blacklistData = [];
+
+async function loadBlacklist() {
+  blacklistData = await sbFetch('blacklist?select=*&order=banned_at.desc').catch(()=>[]) || [];
+}
+
+async function renderBlacklist() {
+  await loadBlacklist();
+  return `
+  <div class="page-header">
+    <div class="page-title">黑名单管理</div>
+    <div class="page-sub">被列入黑名单的员工打开预订页时会看到限制提示，无法继续预约</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>新增黑名单</h3></div>
+    <div class="notice" style="margin:16px 20px 0">姓名需与员工预约时填写的姓名完全一致，系统按姓名精确匹配拦截。</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>姓名</label>
+        <input id="bl-name" placeholder="员工姓名（需与预约姓名一致）">
+      </div>
+      <div class="form-group">
+        <label>事业群（选填）</label>
+        <input id="bl-dept" placeholder="便于识别">
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>原因</label>
+        <input id="bl-reason" placeholder="如：违规占用床位累计2次">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-danger" onclick="addBlacklist()">⛔ 加入黑名单</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>黑名单列表（${blacklistData.length}人）</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>姓名</th><th>事业群</th><th>原因</th><th>封禁时间</th><th>操作</th></tr></thead>
+        <tbody>
+          ${blacklistData.length === 0
+            ? `<tr><td colspan="5"><div class="empty"><div class="empty-icon">✅</div><div class="empty-text">暂无黑名单成员</div></div></td></tr>`
+            : blacklistData.map(b => `
+            <tr>
+              <td><strong>${b.name}</strong></td>
+              <td style="color:var(--gray3)">${b.department||'—'}</td>
+              <td>${b.reason||'—'}</td>
+              <td style="color:var(--gray3);font-size:12px">${b.banned_at?.slice(0,16).replace('T',' ')}</td>
+              <td><button class="btn btn-confirm" onclick="removeBlacklist(${b.id})">✓ 解封</button></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+async function addBlacklist() {
+  const name = document.getElementById('bl-name').value.trim();
+  const dept = document.getElementById('bl-dept').value.trim();
+  const reason = document.getElementById('bl-reason').value.trim();
+  if (!name) { alert('请填写姓名'); return; }
+  try {
+    await sbFetch('blacklist', { method: 'POST', body: JSON.stringify({
+      name, department: dept, reason, banned_at: new Date().toISOString()
+    })});
+    alert('✅ 已加入黑名单');
+    renderPage();
+  } catch(e) { alert('添加失败：' + e.message); }
+}
+
+async function removeBlacklist(id) {
+  if (!confirm('确定解封该员工？解封后可正常预约。')) return;
+  await sbFetch(`blacklist?id=eq.${id}`, { method: 'DELETE' });
+  renderPage();
+}
+
 // ============ TIME SETTINGS ============
 let siteSettings = {};
 
@@ -831,11 +959,11 @@ async function renderTimeSettings() {
     <div class="form-row">
       <div class="form-group">
         <label>开始时间</label>
-        <input type="time" id="s-use_start" value="${v('use_start')}" class="form-group input">
+        <input type="time" id="s-use_start" value="${v('use_start')}" >
       </div>
       <div class="form-group">
         <label>结束时间</label>
-        <input type="time" id="s-use_end" value="${v('use_end')}" class="form-group input">
+        <input type="time" id="s-use_end" value="${v('use_end')}" >
       </div>
     </div>
     <div class="form-actions">
@@ -892,6 +1020,40 @@ async function renderTimeSettings() {
   </div>
 
   <div class="card" style="margin-top:20px">
+    <div class="card-head"><h3>🗓️ 周卡天数与价格</h3></div>
+    <div class="notice" style="margin:16px 20px 0">遇到法定节假日或特殊安排，可临时调整周卡天数（2-7天），价格按 ¥8/天 自动联动计算，无需手动改价。</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>本周周卡天数</label>
+        <select id="s-weekly_days" onchange="previewWeeklyPrice()">
+          ${[2,3,4,5,6,7].map(n=>`<option value="${n}" ${v('weekly_days')==String(n)?'selected':''}>${n} 天</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>对应价格（自动计算）</label>
+        <input type="text" id="weeklyPricePreview" value="¥${(parseInt(v('weekly_days'))||5)*8}" disabled style="background:var(--gray5);font-weight:700;color:var(--blue)">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveSettings(['weekly_days'])">保存周卡天数</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-head"><h3>⛔ 黑名单提示语</h3></div>
+    <div class="notice" style="margin:16px 20px 0">黑名单员工打开预订页时会看到这段提示文字，可自定义措辞。</div>
+    <div class="form-row" style="grid-template-columns:1fr">
+      <div class="form-group">
+        <label>提示文字</label>
+        <input type="text" id="s-blacklist_notice" value="${v('blacklist_notice')}" style="width:100%">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveSettings(['blacklist_notice'])">保存提示语</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
     <div class="card-head"><h3>当前配置预览</h3></div>
     <div class="table-wrap">
       <table>
@@ -907,6 +1069,11 @@ async function renderTimeSettings() {
       </table>
     </div>
   </div>`;
+}
+
+function previewWeeklyPrice() {
+  const days = parseInt(document.getElementById('s-weekly_days').value) || 5;
+  document.getElementById('weeklyPricePreview').value = `¥${days * 8}`;
 }
 
 async function saveSettings(keys) {
